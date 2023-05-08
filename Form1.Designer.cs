@@ -116,6 +116,7 @@ namespace APIX_Winform_Demo
             this.btn_InitialSensor.TabIndex = 0;
             this.btn_InitialSensor.Text = "Initial sensor";
             this.btn_InitialSensor.UseVisualStyleBackColor = true;
+            this.btn_InitialSensor.Click += new System.EventHandler(this.btn_InitialSensor_Click);
             // 
             // groupBox2
             // 

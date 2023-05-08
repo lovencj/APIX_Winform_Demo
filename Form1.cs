@@ -70,7 +70,7 @@ namespace APIX_Winform_Demo
             }
             else if (aMsgType == MessageType.Info)
             {
-                log.Info(aMsg+ ";" + "Message data:" + aMsgData);
+                log.Info(aMsg + ";" + "Message data:" + aMsgData);
             }
             else if (aMsgType == MessageType.Error)
             {
@@ -78,7 +78,7 @@ namespace APIX_Winform_Demo
             }
             else if (aMsgType == MessageType.Data)
             {
-                log.Info("Data message:" + aMsg+";"+"Message data:" + aMsgData);
+                log.Info("Data message:" + aMsg + ";" + "Message data:" + aMsgData);
             }
             //throw new NotImplementedException();
         }
@@ -87,6 +87,7 @@ namespace APIX_Winform_Demo
         {
             Task InitialSensorTask = new Task(() =>
             {
+                
                 IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
                 TimeSpan timeSpan = new TimeSpan(500);
                 sensor.Connect(ipSensorEndPoint, timeSpan);
@@ -127,12 +128,9 @@ namespace APIX_Winform_Demo
 
         private void OnSensorLiveImageEvent(Sensor aSensor, int aOriginX, int aWidth, int aHeight, IntPtr aImageDataPtr)
         {
-            //throw new NotImplementedException();
-            Mat mat = new Mat(aWidth, aHeight, Emgu.CV.CvEnum.DepthType.Cv8U, 1, aImageDataPtr, aWidth);
-
-            //display image, cross thread
-
-
+            //convert it to OpenCV image
+            Mat mat = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1, aImageDataPtr, aWidth);
+            //Cross thread to display image
             new Task(new Action(() =>
             {
                 cv_imageBox1.Invoke(new Action(() =>
@@ -141,27 +139,18 @@ namespace APIX_Winform_Demo
                 }));
             })).Start();
 
-
-            //cv_imageBox1.Invoke(new Action(() =>
-            //{
-            //    cv_imageBox1.Image = mat;
-            //})); 
-
-
-
-           // 
         }
 
         private void OnSensorDisconnectEvent(Sensor aSensor)
         {
-            log.Info("Sensor disconnected");            
-//throw new NotImplementedException();
+            log.Info("Sensor disconnected");
+            //throw new NotImplementedException();
         }
 
         private void OnSensorConnectEvent(Sensor aSensor)
         {
             log.Info("Sensor Connected");
-            
+
             throw new NotImplementedException();
         }
 

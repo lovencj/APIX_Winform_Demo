@@ -83,27 +83,43 @@ namespace APIX_Winform_Demo
             //throw new NotImplementedException();
         }
 
-        public Task InitialSensor(Sensor sensor)
+        public Task<bool> InitialSensor(Sensor sensor)
         {
-            Task InitialSensorTask = new Task(() =>
+            Task<bool> InitialSensorTask = new Task<bool>(() =>
             {
-                
-                IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
-                TimeSpan timeSpan = new TimeSpan(500);
-                sensor.Connect(ipSensorEndPoint, timeSpan);
-                sensor.LoadCalibrationDataFromSensor();
+                bool result = false;
+                try
+                {
+                    IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
+                    TimeSpan timeSpan = new TimeSpan(500);
+                    sensor.Connect(ipSensorEndPoint, timeSpan);
+                    sensor.LoadCalibrationDataFromSensor();
 
-                sensor.OnConnected += new Sensor.OnConnectedDelegate(OnSensorConnectEvent);
-                sensor.OnDisconnected += new Sensor.OnDisconnectedDelegate(OnSensorDisconnectEvent);
-                sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnSensorLiveImageEvent);
-                sensor.OnPilImageNative += new Sensor.OnPilImageNativeDelegate(OnSensorPILNativeEvent);
-                sensor.OnPilImage += new Sensor.OnPilImageDelegate(OnSensorPILEvent);
-                sensor.OnZilImage += new Sensor.OnZilImageDelegate(OnSensorZILEvent);
-                sensor.OnPointCloudImage += new Sensor.OnPointCloudImageDelegate(OnSensorPointCloudEvent);
+                    sensor.OnConnected += new Sensor.OnConnectedDelegate(OnSensorConnectEvent);
+                    sensor.OnDisconnected += new Sensor.OnDisconnectedDelegate(OnSensorDisconnectEvent);
+                    sensor.OnMessage += new Sensor.OnMessageDelegate(OnSensorMessageEvent);
+                    sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnSensorLiveImageEvent);
+                    sensor.OnPilImageNative += new Sensor.OnPilImageNativeDelegate(OnSensorPILNativeEvent);
+                    sensor.OnPilImage += new Sensor.OnPilImageDelegate(OnSensorPILEvent);
+                    sensor.OnZilImage += new Sensor.OnZilImageDelegate(OnSensorZILEvent);
+                    sensor.OnPointCloudImage += new Sensor.OnPointCloudImageDelegate(OnSensorPointCloudEvent);
+                    result = true;
+                }
+                catch (Exception ce)
+                {
+                    log.Error("Initial sensor faild:\n"+ce);
+                }
+                return result;
+
             });
             InitialSensorTask.Start();
             return InitialSensorTask;
 
+        }
+
+        private void OnSensorMessageEvent(Sensor aSensor, MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
+        {
+            throw new NotImplementedException();
         }
 
         private void OnSensorPointCloudEvent(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
@@ -156,14 +172,23 @@ namespace APIX_Winform_Demo
 
         private async void btn_InitialSensor_Click(object sender, EventArgs e)
         {
-            await InitialSensor(Sensor0);
-            Sensor0.SetImageAcquisitionType(ImageAcquisitionType.LiveImage);
-            Sensor0.StartAcquisition();
+            var result=await InitialSensor(Sensor0);
+            if (result)
+            {
+                Sensor0.SetImageAcquisitionType(ImageAcquisitionType.LiveImage);
+                Sensor0.StartAcquisition();
+
+            }
             //IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
             //TimeSpan timeSpan = new TimeSpan(500);
             //Sensor0.Connect(ipSensorEndPoint, timeSpan);
             //Sensor0.LoadCalibrationDataFromSensor();
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Sensor0.SaveParameterSet("MyParameters.json");
         }
     }
 }

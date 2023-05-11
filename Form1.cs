@@ -37,6 +37,8 @@ namespace APIX_Winform_Demo
         Sensor Sensor0 = new Sensor();
 
 
+        APIXSensor Sensor1 = new APIXSensor();
+
 
 
         public Form1()
@@ -44,6 +46,8 @@ namespace APIX_Winform_Demo
             InitializeComponent();
             log.Info("The UI initialed!");
             initSR_APIx();
+
+
 
         }
 
@@ -91,7 +95,7 @@ namespace APIX_Winform_Demo
                 try
                 {
                     IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
-                    TimeSpan timeSpan = new TimeSpan(500);
+                    TimeSpan timeSpan = new TimeSpan(1500);
                     sensor.Connect(ipSensorEndPoint, timeSpan);
                     sensor.LoadCalibrationDataFromSensor();
 
@@ -172,13 +176,19 @@ namespace APIX_Winform_Demo
 
         private async void btn_InitialSensor_Click(object sender, EventArgs e)
         {
-            var result=await InitialSensor(Sensor0);
-            if (result)
-            {
-                Sensor0.SetImageAcquisitionType(ImageAcquisitionType.LiveImage);
-                Sensor0.StartAcquisition();
+            //var result=await InitialSensor(Sensor0);
+            //if (result)
+            //{
+            //    Sensor0.SetImageAcquisitionType(ImageAcquisitionType.LiveImage);
+            //    Sensor0.StartAcquisition();
 
-            }
+            //}
+            var result= await Sensor1.Connect();
+            Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
+            Sensor1.NumberOfProfileToCapture = 1000;
+            Sensor1.PackSize = 1000;
+
+
             //IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
             //TimeSpan timeSpan = new TimeSpan(500);
             //Sensor0.Connect(ipSensorEndPoint, timeSpan);
@@ -189,6 +199,15 @@ namespace APIX_Winform_Demo
         private void button1_Click(object sender, EventArgs e)
         {
             Sensor0.SaveParameterSet("MyParameters.json");
+        }
+
+        private void btn_StartAcquisition_Click(object sender, EventArgs e)
+        {
+            log.Info("Number of profile to capture:" + Sensor1.NumberOfProfileToCapture);
+            log.Info("Packsize:" + Sensor1.PackSize);
+            log.Info("Image Type:" + Sensor1.AcquisitionType);
+            Sensor1.SensorROI=new ROI(0, 4096, 660, 58);
+            Sensor1.StartAcquisition();
         }
     }
 }

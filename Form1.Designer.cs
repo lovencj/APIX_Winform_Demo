@@ -32,6 +32,7 @@ namespace APIX_Winform_Demo
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cv_imageBox1 = new Emgu.CV.UI.ImageBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.btn_SimulateTrigger = new System.Windows.Forms.Button();
             this.btn_StartAcquisition = new System.Windows.Forms.Button();
@@ -46,7 +47,6 @@ namespace APIX_Winform_Demo
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btn_InitialSensor = new System.Windows.Forms.Button();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
-            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -88,6 +88,16 @@ namespace APIX_Winform_Demo
             this.cv_imageBox1.TabIndex = 2;
             this.cv_imageBox1.TabStop = false;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(35, 512);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // groupBox3
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -122,6 +132,7 @@ namespace APIX_Winform_Demo
             this.btn_StartAcquisition.TabIndex = 0;
             this.btn_StartAcquisition.Text = "Start Acquisition";
             this.btn_StartAcquisition.UseVisualStyleBackColor = true;
+            this.btn_StartAcquisition.Click += new System.EventHandler(this.btn_StartAcquisition_Click);
             // 
             // groupBox2
             // 
@@ -229,16 +240,6 @@ namespace APIX_Winform_Demo
             this.vScrollBar1.Name = "vScrollBar1";
             this.vScrollBar1.Size = new System.Drawing.Size(20, 729);
             this.vScrollBar1.TabIndex = 0;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(35, 512);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 

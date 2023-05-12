@@ -60,14 +60,18 @@ namespace APIX_Winform_Demo
 
         private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
+            Sensor1.WriteIO(0);
+
             //Cross thread to display image
             new Task(new Action(() =>
             {
                 cv_imageBox1.Invoke(new Action(() =>
                 {
+                    //cv_imageBox1.Image.Dispose();
                     cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
                 }));
             })).Start();
+
         }
 
         private void OnSensorMessgae(MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
@@ -81,10 +85,11 @@ namespace APIX_Winform_Demo
 
             var result= await Sensor1.Connect();
             Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-            Sensor1.NumberOfProfileToCapture = 5000;
+            Sensor1.NumberOfProfileToCapture = 50000;
             Sensor1.PackSize = 1000;
-            Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
-            Sensor1.SensorInternalTriggerFreq = 7000;
+            Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
+            Sensor1.SensorInternalTriggerFreq = 11000;
+            Sensor1.StartTriggerEnable= true;
 
         }
 
@@ -93,7 +98,7 @@ namespace APIX_Winform_Demo
             //Sensor0.SaveParameterSet("MyParameters.json");
         }
 
-        private void btn_StartAcquisition_Click(object sender, EventArgs e)
+        private async void btn_StartAcquisition_Click(object sender, EventArgs e)
         {
             isStarted = !isStarted;
             if (isStarted)
@@ -102,7 +107,8 @@ namespace APIX_Winform_Demo
                 log.Info("Packsize:" + Sensor1.PackSize);
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
                 Sensor1.SensorROI = new ROI(0, 4096, 660, 58);
-                Sensor1.StartAcquisition();
+                var s=await Sensor1.StartAcquisition();
+                var s1 = await Sensor1.WriteIO(0);
             }
             else if (!isStarted)
             {

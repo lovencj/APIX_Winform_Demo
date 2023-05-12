@@ -17,6 +17,7 @@ using SmartRay;
 using SmartRay.Api;
 using System.Net;
 using static APIX_Winform_Demo.SRSensorImageHandler;
+using System.Threading;
 
 
 //[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
@@ -584,12 +585,14 @@ namespace APIX_Winform_Demo
                 bool succeeded=false;
                 try
                 {
-
+                    sensor.SetDigitalOutput(DigitalOutput.Channel2, true);
+                    Thread.Sleep(20);
+                    sensor.SetDigitalOutput(DigitalOutput.Channel2,false);
+                    succeeded=true;
                 }
                 catch (Exception ce)
                 {
-
-                    throw;
+                    log.Error("Set sensor output failed,\nPlease check the sensor status, the error message as below:\n" + ce.Message);
                 }
                 return succeeded;
             });

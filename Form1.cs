@@ -31,10 +31,10 @@ namespace APIX_Winform_Demo
     public partial class Form1 : Form
     {
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private bool isStarted=false;
 
 
-
-        Sensor Sensor0 = new Sensor();
+        //Sensor Sensor0 = new Sensor();
 
 
         APIXSensor Sensor1 = new APIXSensor();
@@ -60,8 +60,21 @@ namespace APIX_Winform_Demo
             log.Info("The API version is:" + ApiManager.Version);
             //ApiManager.EnableConsoleLogging();
             ApiManager.OnMessage += new ApiManager.OnMessageDelegate(OnSensorMessgae);
+            Sensor1.SensorImageEvent += Sensor1_SensorImageEvent;
 
             return true;
+        }
+
+        private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
+        {
+            //Cross thread to display image
+            new Task(new Action(() =>
+            {
+                cv_imageBox1.Invoke(new Action(() =>
+                {
+                    cv_imageBox1.Image = SRimageHandlerArgument.zilimage;
+                }));
+            })).Start();
         }
 
         private void OnSensorMessgae(MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
@@ -87,92 +100,80 @@ namespace APIX_Winform_Demo
             //throw new NotImplementedException();
         }
 
-        public Task<bool> InitialSensor(Sensor sensor)
-        {
-            Task<bool> InitialSensorTask = new Task<bool>(() =>
-            {
-                bool result = false;
-                try
-                {
-                    IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
-                    TimeSpan timeSpan = new TimeSpan(1500);
-                    sensor.Connect(ipSensorEndPoint, timeSpan);
-                    sensor.LoadCalibrationDataFromSensor();
+        //public Task<bool> InitialSensor(Sensor sensor)
+        //{
+        //    Task<bool> InitialSensorTask = new Task<bool>(() =>
+        //    {
+        //        bool result = false;
+        //        try
+        //        {
+        //            IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse("192.168.178.200"), 40);
+        //            TimeSpan timeSpan = new TimeSpan(1500);
+        //            sensor.Connect(ipSensorEndPoint, timeSpan);
+        //            sensor.LoadCalibrationDataFromSensor();
 
-                    sensor.OnConnected += new Sensor.OnConnectedDelegate(OnSensorConnectEvent);
-                    sensor.OnDisconnected += new Sensor.OnDisconnectedDelegate(OnSensorDisconnectEvent);
-                    sensor.OnMessage += new Sensor.OnMessageDelegate(OnSensorMessageEvent);
-                    sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnSensorLiveImageEvent);
-                    sensor.OnPilImageNative += new Sensor.OnPilImageNativeDelegate(OnSensorPILNativeEvent);
-                    sensor.OnPilImage += new Sensor.OnPilImageDelegate(OnSensorPILEvent);
-                    sensor.OnZilImage += new Sensor.OnZilImageDelegate(OnSensorZILEvent);
-                    sensor.OnPointCloudImage += new Sensor.OnPointCloudImageDelegate(OnSensorPointCloudEvent);
-                    result = true;
-                }
-                catch (Exception ce)
-                {
-                    log.Error("Initial sensor faild:\n"+ce);
-                }
-                return result;
+        //            sensor.OnConnected += new Sensor.OnConnectedDelegate(OnSensorConnectEvent);
+        //            sensor.OnDisconnected += new Sensor.OnDisconnectedDelegate(OnSensorDisconnectEvent);
+        //            sensor.OnMessage += new Sensor.OnMessageDelegate(OnSensorMessageEvent);
+        //            sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnSensorLiveImageEvent);
+        //            sensor.OnPilImage += new Sensor.OnPilImageDelegate(OnSensorPILImageEvent);
+        //            result = true;
+        //        }
+        //        catch (Exception ce)
+        //        {
+        //            log.Error("Initial sensor faild:\n"+ce);
+        //        }
+        //        return result;
 
-            });
-            InitialSensorTask.Start();
-            return InitialSensorTask;
+        //    });
+        //    InitialSensorTask.Start();
+        //    return InitialSensorTask;
 
-        }
+        //}
 
-        private void OnSensorMessageEvent(Sensor aSensor, MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
-        {
-            throw new NotImplementedException();
-        }
+        //private void OnSensorPILImageEvent(Sensor aSensor, SmartRay.Api.ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, ushort[] aProfileImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        private void OnSensorPointCloudEvent(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
-        {
-            throw new NotImplementedException();
-        }
+        //private void Sensor_OnPilImage(Sensor aSensor, SmartRay.Api.ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, ushort[] aProfileImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        private void OnSensorZILEvent(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, ushort[] aZMapImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, float aOriginYMillimeters)
-        {
-            throw new NotImplementedException();
-        }
+        //private void OnSensorMessageEvent(Sensor aSensor, MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        private void OnSensorPILEvent(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, ushort[] aProfileImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
-        {
-            throw new NotImplementedException();
-        }
 
-        private void OnSensorPILNativeEvent(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, IntPtr aProfileImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
-        {
-            throw new NotImplementedException();
-        }
+        //private void OnSensorLiveImageEvent(Sensor aSensor, int aOriginX, int aWidth, int aHeight, IntPtr aImageDataPtr)
+        //{
+        //    //convert it to OpenCV image
+        //    Mat mat = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1, aImageDataPtr, aWidth);
+        //    //Cross thread to display image
+        //    new Task(new Action(() =>
+        //    {
+        //        cv_imageBox1.Invoke(new Action(() =>
+        //        {
+        //            cv_imageBox1.Image = mat;
+        //        }));
+        //    })).Start();
 
-        private void OnSensorLiveImageEvent(Sensor aSensor, int aOriginX, int aWidth, int aHeight, IntPtr aImageDataPtr)
-        {
-            //convert it to OpenCV image
-            Mat mat = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1, aImageDataPtr, aWidth);
-            //Cross thread to display image
-            new Task(new Action(() =>
-            {
-                cv_imageBox1.Invoke(new Action(() =>
-                {
-                    cv_imageBox1.Image = mat;
-                }));
-            })).Start();
+        //}
 
-        }
+        //private void OnSensorDisconnectEvent(Sensor aSensor)
+        //{
+        //    log.Info("Sensor disconnected");
+        //    //throw new NotImplementedException();
+        //}
 
-        private void OnSensorDisconnectEvent(Sensor aSensor)
-        {
-            log.Info("Sensor disconnected");
-            //throw new NotImplementedException();
-        }
+        //private void OnSensorConnectEvent(Sensor aSensor)
+        //{
+        //    log.Info("Sensor Connected");
 
-        private void OnSensorConnectEvent(Sensor aSensor)
-        {
-            log.Info("Sensor Connected");
-
-            throw new NotImplementedException();
-        }
+        //    throw new NotImplementedException();
+        //}
 
         private async void btn_InitialSensor_Click(object sender, EventArgs e)
         {
@@ -198,16 +199,26 @@ namespace APIX_Winform_Demo
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Sensor0.SaveParameterSet("MyParameters.json");
+            //Sensor0.SaveParameterSet("MyParameters.json");
         }
 
         private void btn_StartAcquisition_Click(object sender, EventArgs e)
         {
-            log.Info("Number of profile to capture:" + Sensor1.NumberOfProfileToCapture);
-            log.Info("Packsize:" + Sensor1.PackSize);
-            log.Info("Image Type:" + Sensor1.AcquisitionType);
-            Sensor1.SensorROI=new ROI(0, 4096, 660, 58);
-            Sensor1.StartAcquisition();
+            isStarted = !isStarted;
+            if (isStarted)
+            {
+                log.Info("Number of profile to capture:" + Sensor1.NumberOfProfileToCapture);
+                log.Info("Packsize:" + Sensor1.PackSize);
+                log.Info("Image Type:" + Sensor1.AcquisitionType);
+                Sensor1.SensorROI = new ROI(0, 4096, 660, 58);
+                Sensor1.StartAcquisition();
+            }
+            else if (!isStarted)
+            {
+                log.Info("Sensor stop acquisition");
+                Sensor1.StopAcquisition();
+            }
+
         }
     }
 }

@@ -16,6 +16,7 @@ using Emgu.CV;
 using SmartRay;
 using SmartRay.Api;
 using System.Net;
+using static APIX_Winform_Demo.SRSensorImageHandler;
 
 
 //[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
@@ -27,6 +28,20 @@ namespace APIX_Winform_Demo
 
         private Sensor sensor;
 
+
+        /// <summary>
+        /// 2. define event delegate
+        /// </summary>
+        /// <param name="sensor"></param>
+        /// <param name="imageHandlerArgument"></param>
+
+        public delegate void SensorImageDelegateHandler(object sensor, SRImageHandlerArgument SRimageHandlerArgument);
+
+        /// <summary>
+        /// 3. define event
+        /// </summary>
+        public event SensorImageDelegateHandler SensorImageEvent;
+
         public APIXSensor()
         {
             log.Info("Initial sensor class");
@@ -35,12 +50,11 @@ namespace APIX_Winform_Demo
             sensor.OnDisconnected += new Sensor.OnDisconnectedDelegate(OnDisconnectedEvent);
             sensor.OnMessage += new Sensor.OnMessageDelegate(OnSensorMessageEvent);
             sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnLiveImageEvent);
-            sensor.OnPilImage += new Sensor.OnPilImageDelegate(OnPILImageEvent);
-            sensor.OnPilImageNative += new Sensor.OnPilImageNativeDelegate(OnPILNativeImageEvent);
-            sensor.OnPointCloudImage += new Sensor.OnPointCloudImageDelegate(OnPintCloudEvent);
-            sensor.OnZilImage += new Sensor.OnZilImageDelegate(OnZILImageEvent);
-            sensor.OnZilImageNative += new Sensor.OnZilImageNativeDelegate(OnZILNativeImageEvent);
-
+            sensor.OnPilImage += Sensor_OnPilImage;
+            sensor.OnPilImageNative += Sensor_OnPilImageNative;
+            sensor.OnZilImage += Sensor_OnZilImage;
+            sensor.OnZilImageNative += Sensor_OnZilImageNative;
+            sensor.OnPointCloudImage += Sensor_OnPointCloudImage;
             //intial the sensor parameters
             this._IPAddress = "192.168.178.200";//default IPAddress
             this._portNumber = 40;//default port number;
@@ -54,41 +68,54 @@ namespace APIX_Winform_Demo
 
 
         }
+        #region callback functions
 
-        private void OnZILNativeImageEvent(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, IntPtr aZMapImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, float aOriginYMillimeters)
-        {
-            //throw new NotImplementedException();
-        }
-
-        private void OnZILImageEvent(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, ushort[] aZMapImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, float aOriginYMillimeters)
-        {
-            //throw new NotImplementedException();
-        }
-
-        private void OnPintCloudEvent(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
         {
             throw new NotImplementedException();
         }
 
-        private void OnPILImageEvent(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, ushort[] aProfileImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        private void Sensor_OnZilImageNative(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, IntPtr aZMapImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, float aOriginYMillimeters)
         {
-            //throw new NotImplementedException();
+            log.Info("ZIL native callback");
+            SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
+            sRImageHandlerArgument.zilimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth*sizeof(UInt16));
+            this.SensorImageEvent(aSensor,sRImageHandlerArgument);
         }
 
-        private void OnPILNativeImageEvent(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, IntPtr aProfileImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        private void Sensor_OnZilImage(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, ushort[] aZMapImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, float aOriginYMillimeters)
         {
-            //throw new NotImplementedException();
+            log.Info("ZIL  callback");
+
         }
+
+        private void Sensor_OnPilImageNative(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, IntPtr aProfileImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        {
+            // throw new NotImplementedException();
+            log.Info("PIL native callback");
+        }
+
+        private void Sensor_OnPilImage(Sensor aSensor, SmartRay.Api.ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, ushort[] aProfileImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        {
+            // throw new NotImplementedException();
+            log.Info("PIL callback");
+
+        }
+
 
         private void OnLiveImageEvent(Sensor aSensor, int aOriginX, int aWidth, int aHeight, IntPtr aImageDataPtr)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void OnSensorMessageEvent(Sensor aSensor, MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
         {
             //throw new NotImplementedException();
         }
+
+
+        #endregion
+
 
         private void OnDisconnectedEvent(Sensor aSensor)
         {
@@ -266,9 +293,6 @@ namespace APIX_Winform_Demo
 
         }
 
-
-
-
         private ROI _aROI;
 
         public ROI SensorROI
@@ -361,7 +385,7 @@ namespace APIX_Winform_Demo
                     else
                     {
                         startAcqusition = false;
-                        log.Error("sensor not connected yet or the sensor disconnected,\n please check the sensor status");
+                        log.Error("sensor not connected yet or the sensor disconnected,\nPlease check the sensor status");
                     }
                 }
                 catch (Exception ce)
@@ -373,6 +397,38 @@ namespace APIX_Winform_Demo
             });
             startacqTask.Start();
             return startacqTask;
+        }
+
+
+        public Task<bool> StopAcquisition()
+        {
+            Task<bool> stopAcqTask = new Task<bool>(() =>
+            {
+                bool stopAcqusition = false;
+                try
+                {
+                    if (_isSensorConnected)
+                    {
+                        sensor.StopAcquisition();
+                        stopAcqusition = true;
+                    }
+                    else
+                    {
+                        stopAcqusition = false;
+                        log.Error("sensor not connected yet or the sensor disconnected,\nPlease check the sensor status");
+                    }
+                }
+                catch (Exception ce)
+                {
+                    stopAcqusition = false;
+                    log.Error("Execute sensor stop acquisition failed,\nPlease check the sensor status, the error message as below:\n" + ce.Message);
+                }
+                return stopAcqusition;
+
+            });
+            stopAcqTask.Start();
+            return stopAcqTask;
+
         }
 
         #endregion
@@ -397,4 +453,61 @@ namespace APIX_Winform_Demo
             Height = _Height;
         }
     }
+
+
+    /// <summary>
+    /// 1. define event args
+    /// </summary>
+    public class SRImageHandlerArgument : EventArgs
+    {
+        public Mat liveimage;
+        public Mat pilimage;
+        public Mat zilimage;
+        public Point3F[] pointcloud;
+        public uint imageheight;
+        public uint imagewidth;
+        public ImageDataType imagetype;
+        public SRImageHandlerArgument()
+        {
+            liveimage = null;
+            pilimage = null;
+            zilimage = null;
+            pointcloud = null;
+            imageheight = 0;
+            imagewidth = 0;
+            imagetype = ImageDataType.Invalid;
+        }
+
+    }
+
+
+    /// <summary>
+    /// define the image event handle
+    /// </summary>
+    public class SRSensorImageHandler
+    {
+
+
+        public SRSensorImageHandler()
+        {
+
+
+        }
+    }
+    /// <summary>
+    /// define image type
+    /// </summary>
+    //public enum SRImageDataType : uint
+    //{
+    //    LiveImage = 0,
+    //    Profile = 1,
+    //    Intensity = 2,
+    //    ProfileIntensityLaserLineThickness = 3,
+    //    ProfileIntensity = 9,
+    //    ZMap = 10,
+    //    ZMapIntensity = 11,
+    //    ZMapIntensityLaserLineThickness = 12,
+    //    PointCloud = 13,
+    //    Invalid = uint.MaxValue
+    //}
 }

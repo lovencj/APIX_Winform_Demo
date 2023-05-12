@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Runtime.InteropServices;
 //define log4net
 using log4net;
 
@@ -27,6 +27,12 @@ namespace APIX_Winform_Demo
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private Sensor sensor;
+
+        private uint ProfileCounter = 0;
+
+        private Mat profileimage = new Mat();
+        private Mat intensityImage=new Mat();
+        private Mat laserlinethickness = new Mat();
 
 
         /// <summary>
@@ -52,7 +58,7 @@ namespace APIX_Winform_Demo
             sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnLiveImageEvent);
             sensor.OnPilImage += Sensor_OnPilImage;
             sensor.OnPilImageNative += Sensor_OnPilImageNative;
-            sensor.OnZilImage += Sensor_OnZilImage;
+            //sensor.OnZilImage += Sensor_OnZilImage;
             sensor.OnZilImageNative += Sensor_OnZilImageNative;
             sensor.OnPointCloudImage += Sensor_OnPointCloudImage;
             //intial the sensor parameters
@@ -77,10 +83,38 @@ namespace APIX_Winform_Demo
 
         private void Sensor_OnZilImageNative(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, IntPtr aZMapImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, float aOriginYMillimeters)
         {
+            ProfileCounter++;
+
             log.Info("ZIL native callback");
             SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
-            sRImageHandlerArgument.zilimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth*sizeof(UInt16));
-            this.SensorImageEvent(aSensor,sRImageHandlerArgument);
+
+            Mat _profileMatimage= new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
+            
+            if (ProfileCounter<this._PacketCounter)
+            {
+                profileimage.PushBack(_profileMatimage);
+                Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
+                Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
+                Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
+
+            }
+            else
+            {
+                sRImageHandlerArgument.profile_image = profileimage.Clone();
+                //sRImageHandlerArgument.intensity_image = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aIntensityImageData, aWidth * sizeof(UInt16));
+                //sRImageHandlerArgument.laserlinethickness_image = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aLaserLineThicknessImageData, aWidth * sizeof(UInt16));
+                sRImageHandlerArgument.imagetype = aImageDataType;
+                sRImageHandlerArgument.imageheight = (uint)profileimage.Height;
+                sRImageHandlerArgument.imagewidth = (uint)profileimage.Width;
+                //trigger event
+                this.SensorImageEvent(aSensor, sRImageHandlerArgument);
+                ProfileCounter = 0;
+                profileimage.Dispose();
+                profileimage = new Mat();
+
+            }
+
+
         }
 
         private void Sensor_OnZilImage(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, ushort[] aZMapImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, float aOriginYMillimeters)
@@ -111,6 +145,24 @@ namespace APIX_Winform_Demo
         private void OnSensorMessageEvent(Sensor aSensor, MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
         {
             //throw new NotImplementedException();
+            if (aMsg == null)
+                return;
+            if (aMsgType == MessageType.Connection)
+            {
+                log.Info("sensor is connection");
+            }
+            else if (aMsgType == MessageType.Info)
+            {
+                log.Info(aMsg + ";" + "Message data:" + aMsgData);
+            }
+            else if (aMsgType == MessageType.Error)
+            {
+                log.Error(aMsg);
+            }
+            else if (aMsgType == MessageType.Data)
+            {
+                //log.Info("Data message:" + aMsg + ";" + "Message data:" + aMsgData);
+            }
         }
 
 
@@ -256,6 +308,31 @@ namespace APIX_Winform_Demo
         }
 
 
+        private uint _PacketCounter;
+
+        public uint PacketCounter
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _PacketCounter = this._NumberOfProfileToCapture / _PackSize;
+                }
+                return _PacketCounter;
+            }
+
+            set
+            {
+                _PacketCounter = value;
+                if (_isSensorConnected)
+                {
+                    _PacketCounter = this._NumberOfProfileToCapture / _PackSize;
+                }
+            }
+        }
+
+
+
         private TimeSpan _PacketTimeout;
 
         public TimeSpan PacketTimeout
@@ -336,6 +413,72 @@ namespace APIX_Winform_Demo
             }
         }
 
+        private DataTriggerMode _sensorDataTriggerMode;
+
+        public DataTriggerMode SensorDataTriggerMode
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.GetDataTriggerMode(out _sensorDataTriggerMode);
+                }
+                return _sensorDataTriggerMode;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetDataTriggerMode(value);
+                }
+                _sensorDataTriggerMode = value;
+            }
+        }
+
+        private uint _sensorInternalTriggerFreq;
+
+        public uint SensorInternalTriggerFreq
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _sensorInternalTriggerFreq=(uint)sensor.GetDataTriggerInternalFrequency();
+                        
+                }
+                return _sensorInternalTriggerFreq;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetDataTriggerInternalFrequency((int)value);
+                }
+                _sensorInternalTriggerFreq = value;
+            }
+        }
+
+        private bool _StartTriggerEnable;
+
+        public bool StartTriggerEnable
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.GetStartTrigger(out StartTriggerSource source,out _StartTriggerEnable,out TriggerEdgeMode edgeMode);
+                }
+                return _StartTriggerEnable;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetStartTrigger(StartTriggerSource.Input0, value, TriggerEdgeMode.RisingEdge);
+                }
+                _StartTriggerEnable = value;
+            }
+        }
 
 
 
@@ -352,6 +495,7 @@ namespace APIX_Winform_Demo
                     TimeSpan timeSpan = new TimeSpan(500);
                     sensor.Connect(ipSensorEndPoint, timeSpan);
                     sensor.LoadCalibrationDataFromSensor();
+                    
                     log.Info("Sensor connected!");
                     //sensor.Granularity
 
@@ -379,6 +523,7 @@ namespace APIX_Winform_Demo
                 {
                     if (_isSensorConnected)
                     {
+                        PacketCounter = this.NumberOfProfileToCapture / this.PackSize;
                         sensor.StartAcquisition();
                         startAcqusition = true;
                     }
@@ -431,6 +576,26 @@ namespace APIX_Winform_Demo
 
         }
 
+
+        public Task<bool> WriteIO(uint Output_port_number)
+        {
+            Task<bool> writeIotask = new Task<bool>(() =>
+            {
+                bool succeeded=false;
+                try
+                {
+
+                }
+                catch (Exception ce)
+                {
+
+                    throw;
+                }
+                return succeeded;
+            });
+            writeIotask.Start();
+            return writeIotask;
+        }
         #endregion
 
     }
@@ -461,8 +626,9 @@ namespace APIX_Winform_Demo
     public class SRImageHandlerArgument : EventArgs
     {
         public Mat liveimage;
-        public Mat pilimage;
-        public Mat zilimage;
+        public Mat profile_image;
+        public Mat intensity_image;
+        public Mat laserlinethickness_image;
         public Point3F[] pointcloud;
         public uint imageheight;
         public uint imagewidth;
@@ -470,8 +636,9 @@ namespace APIX_Winform_Demo
         public SRImageHandlerArgument()
         {
             liveimage = null;
-            pilimage = null;
-            zilimage = null;
+            profile_image = null;
+            intensity_image = null;
+            laserlinethickness_image = null;
             pointcloud = null;
             imageheight = 0;
             imagewidth = 0;

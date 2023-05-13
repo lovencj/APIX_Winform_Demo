@@ -60,6 +60,7 @@ namespace APIX_Winform_Demo
 
         private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
+            log.Info("Acquisition completed, trigger the sensor again and display");
             Sensor1.WriteIO(0);
 
             //Cross thread to display image
@@ -71,7 +72,7 @@ namespace APIX_Winform_Demo
                     cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
                 }));
             })).Start();
-
+            GC.Collect();
         }
 
         private void OnSensorMessgae(MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
@@ -85,11 +86,16 @@ namespace APIX_Winform_Demo
 
             var result= await Sensor1.Connect();
             Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-            Sensor1.NumberOfProfileToCapture = 50000;
+            Sensor1.NumberOfProfileToCapture = 7000;
             Sensor1.PackSize = 1000;
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
             Sensor1.SensorInternalTriggerFreq = 11000;
             Sensor1.StartTriggerEnable= true;
+            List<ExposureGain> exposureGains = new List<ExposureGain>();
+            exposureGains.Add(new ExposureGain(3d, 3));
+            exposureGains.Add(new ExposureGain(15d, 2));
+            Sensor1.ExposuresAndGains = exposureGains;
+            //Sensor1.ExposuresAndGains.Add(new ExposureGain(30d, 2));
 
         }
 
@@ -106,9 +112,10 @@ namespace APIX_Winform_Demo
                 log.Info("Number of profile to capture:" + Sensor1.NumberOfProfileToCapture);
                 log.Info("Packsize:" + Sensor1.PackSize);
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
+                log.Info("exposure and gain:" + Sensor1.ExposuresAndGains.Count);
                 Sensor1.SensorROI = new ROI(0, 4096, 660, 58);
                 var s=await Sensor1.StartAcquisition();
-                var s1 = await Sensor1.WriteIO(0);
+                Sensor1.WriteIO(0);
             }
             else if (!isStarted)
             {

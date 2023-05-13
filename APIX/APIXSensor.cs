@@ -62,6 +62,7 @@ namespace APIX_Winform_Demo
             //sensor.OnZilImage += Sensor_OnZilImage;
             sensor.OnZilImageNative += Sensor_OnZilImageNative;
             sensor.OnPointCloudImage += Sensor_OnPointCloudImage;
+            
             //intial the sensor parameters
             this._IPAddress = "192.168.178.200";//default IPAddress
             this._portNumber = 40;//default port number;
@@ -70,6 +71,7 @@ namespace APIX_Winform_Demo
             this._NumberOfProfileToCapture = 1000;
             this._PackSize = 500;
             this._PacketTimeout = new TimeSpan(0, 0, 0, 0, 500);
+            this._exposuresAndgains = new List<ExposureGain>();
 
 
 
@@ -86,7 +88,7 @@ namespace APIX_Winform_Demo
         {
             ProfileCounter++;
 
-            log.Info("ZIL native callback");
+            //log.Info("ZIL native callback");
             SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
 
             Mat _profileMatimage= new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
@@ -482,6 +484,55 @@ namespace APIX_Winform_Demo
         }
 
 
+        private List<ExposureGain> _exposuresAndgains;
+
+        public List<ExposureGain> ExposuresAndGains
+        {
+            get
+            {
+                _exposuresAndgains.Clear();
+                if (_isSensorConnected)
+                {
+                    int exposureCounter= sensor.GetNumberOfExposureTimes();
+                    sensor.GetGain(out bool isGainEnable,out int gainValue);
+                    for (int i = 0; i < exposureCounter; i++)
+                    {
+                        sensor.GetExposureDuration(i,out double _expo);
+                        _exposuresAndgains.Add(new ExposureGain(_expo, gainValue));
+                    }
+                }
+                else
+                {
+                    log.Warn("sensor not connected,can't get the exposure time and gain values");
+
+                }
+                return _exposuresAndgains;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    int exposureCount = value.Count;
+                    if (exposureCount>1)
+                    {
+                        sensor.SetNumberOfExposureTimes(exposureCount);
+                    }
+                    for (int i = 0; i < exposureCount; i++)
+                    {
+                        sensor.SetExposureDuration(i, value[i].ExposureTime);
+                        if (value[i].Gain>0)
+                        {
+                            sensor.SetGain(true, value[i].Gain);
+                        }
+                    }
+                }
+                _exposuresAndgains = value;
+            }
+        }
+
+
+
+
 
 
         #endregion
@@ -588,6 +639,7 @@ namespace APIX_Winform_Demo
                     sensor.SetDigitalOutput(DigitalOutput.Channel2, true);
                     Thread.Sleep(20);
                     sensor.SetDigitalOutput(DigitalOutput.Channel2,false);
+                    
                     succeeded=true;
                 }
                 catch (Exception ce)
@@ -664,20 +716,67 @@ namespace APIX_Winform_Demo
 
         }
     }
+
     /// <summary>
-    /// define image type
+    /// define the exposure time and gain values parameters
     /// </summary>
-    //public enum SRImageDataType : uint
-    //{
-    //    LiveImage = 0,
-    //    Profile = 1,
-    //    Intensity = 2,
-    //    ProfileIntensityLaserLineThickness = 3,
-    //    ProfileIntensity = 9,
-    //    ZMap = 10,
-    //    ZMapIntensity = 11,
-    //    ZMapIntensityLaserLineThickness = 12,
-    //    PointCloud = 13,
-    //    Invalid = uint.MaxValue
-    //}
+
+    public struct ExposureGain
+    {
+        private double _exposureTime;
+
+        public double ExposureTime
+        {
+            get
+            {
+                return _exposureTime;
+            }
+            set
+            {
+                if (_exposureTime >0)
+                {
+                    _exposureTime = value;
+                }
+                else
+                {
+                    _exposureTime= 10;
+                }
+            }
+        }
+
+        private int _gain;
+
+        public int Gain
+        {
+            get
+            {
+                return _gain;
+            }
+            set
+            {
+                //check the gain value, this value can't set bigger than 5
+                if (value >= 0 && value <= 5)
+                {
+                    _gain = value;
+                }
+                else
+                {
+                    _gain = 0;
+                }               
+            }
+        }
+
+        /// <summary>
+        /// Initial the exposure and gain value
+        /// </summary>
+        /// <param name="exposure">exposure time, value from 0 to 1000</param>
+        /// <param name="gain"></param>
+        public ExposureGain(double exposure=10, int gain=0)
+        {
+            this._exposureTime = exposure;
+            this._gain = gain;
+        }
+
+    }
+
 }

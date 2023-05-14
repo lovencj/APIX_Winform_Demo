@@ -86,7 +86,7 @@ namespace APIX_Winform_Demo
 
             var result= await Sensor1.Connect();
             Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-            Sensor1.NumberOfProfileToCapture = 10000;
+            Sensor1.NumberOfProfileToCapture = 5000;
             Sensor1.PackSize = 1000;
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
             Sensor1.SensorInternalTriggerFreq = 11000;
@@ -97,6 +97,9 @@ namespace APIX_Winform_Demo
             exposureGains.Add(new ExposureGain(3d, 3));
             exposureGains.Add(new ExposureGain(15d, 2));
             Sensor1.ExposuresAndGains = exposureGains;
+
+            //disable the button
+            btn_InitialSensor.Enabled = false;
             //Sensor1.ExposuresAndGains.Add(new ExposureGain(30d, 2));
 
         }
@@ -118,13 +121,16 @@ namespace APIX_Winform_Demo
                 Sensor1.SensorROI = new ROI(0, 4096, 660, 58);
                 var s=await Sensor1.StartAcquisition();
                 var s1 = await Sensor1.WriteIO(0);
+                
             }
             else if (!isStarted)
             {
                 log.Info("Sensor stop acquisition");
                 Sensor1.StopAcquisition();
             }
-
+            //set the button color
+            btn_StartAcquisition.BackColor= isStarted? Color.Green : Color.Red;
+            btn_StartAcquisition.Text = isStarted ? "Sensor running" : "Sensor Stop";
         }
     }
 }

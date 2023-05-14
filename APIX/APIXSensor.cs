@@ -683,14 +683,14 @@ namespace APIX_Winform_Demo
                 try
                 {
                     sensor.SetDigitalOutput(DigitalOutput.Channel2, true);
-                    Thread.Sleep(20);
+                    Thread.Sleep(50);
                     sensor.SetDigitalOutput(DigitalOutput.Channel2,false);
                     
                     succeeded=true;
                 }
                 catch (Exception ce)
                 {
-                    log.Error("Set sensor output failed,\nPlease check the sensor status, the error message as below:\n" + ce.Message);
+                    log.Error("Set sensor output failed,Please check the sensor status, the error message as below:\n" + ce.Message);
                 }
                 return succeeded;
             });

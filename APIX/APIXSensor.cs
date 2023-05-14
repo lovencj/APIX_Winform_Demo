@@ -530,6 +530,25 @@ namespace APIX_Winform_Demo
             }
         }
 
+        //private bool _isTriggerOverflow;
+
+        //public bool isTriggerOverflow
+        //{
+        //    get
+        //    {
+        //        if (_isSensorConnected)
+        //        { 
+        //            _isTriggerOverflow=sensor.max
+        //        }
+        //        return _isTriggerOverflow;
+        //    }
+        //    set
+        //    {
+        //        _isTriggerOverflow = value;
+        //    }
+        //}
+
+
 
 
 

@@ -86,7 +86,7 @@ namespace APIX_Winform_Demo
 
             var result= await Sensor1.Connect();
             Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-            Sensor1.NumberOfProfileToCapture = 7000;
+            Sensor1.NumberOfProfileToCapture = 10000;
             Sensor1.PackSize = 1000;
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
             Sensor1.SensorInternalTriggerFreq = 11000;

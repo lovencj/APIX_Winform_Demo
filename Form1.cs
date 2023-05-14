@@ -91,6 +91,8 @@ namespace APIX_Winform_Demo
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
             Sensor1.SensorInternalTriggerFreq = 11000;
             Sensor1.StartTriggerEnable= true;
+            Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
+
             List<ExposureGain> exposureGains = new List<ExposureGain>();
             exposureGains.Add(new ExposureGain(3d, 3));
             exposureGains.Add(new ExposureGain(15d, 2));
@@ -115,7 +117,7 @@ namespace APIX_Winform_Demo
                 log.Info("exposure and gain:" + Sensor1.ExposuresAndGains.Count);
                 Sensor1.SensorROI = new ROI(0, 4096, 660, 58);
                 var s=await Sensor1.StartAcquisition();
-                Sensor1.WriteIO(0);
+                var s1 = await Sensor1.WriteIO(0);
             }
             else if (!isStarted)
             {

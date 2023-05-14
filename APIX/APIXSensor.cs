@@ -68,6 +68,7 @@ namespace APIX_Winform_Demo
             this._portNumber = 40;//default port number;
             this._isSensorConnected = false;
             this._AcquisitionType = ImageAcquisitionType.ProfileIntensityLaserLineThickness;
+            this._acquistionMode = AcquisitionMode.RepeatSnapshot;
             this._NumberOfProfileToCapture = 1000;
             this._PackSize = 500;
             this._PacketTimeout = new TimeSpan(0, 0, 0, 0, 500);
@@ -96,6 +97,7 @@ namespace APIX_Winform_Demo
             if (ProfileCounter<this._PacketCounter)
             {
                 profileimage.PushBack(_profileMatimage);
+                //release unused memory 
                 Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
                 Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
                 Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
@@ -530,6 +532,30 @@ namespace APIX_Winform_Demo
             }
         }
 
+
+        private AcquisitionMode _acquistionMode;
+
+        public AcquisitionMode acquisitionMode
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _acquistionMode=sensor.GetAcquisitionMode();
+                }
+                return _acquistionMode;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetAcquisitionMode(value);
+                }
+                _acquistionMode = value;
+            }
+        }
+
+
         //private bool _isTriggerOverflow;
 
         //public bool isTriggerOverflow
@@ -596,6 +622,7 @@ namespace APIX_Winform_Demo
                     {
                         PacketCounter = this.NumberOfProfileToCapture / this.PackSize;
                         sensor.StartAcquisition();
+                        //sensor.SetAcquisitionMode
                         startAcqusition = true;
                     }
                     else

@@ -126,7 +126,7 @@ namespace APIX_Winform_Demo
             else if (!isStarted)
             {
                 log.Info("Sensor stop acquisition");
-                Sensor1.StopAcquisition();
+                var s1=await Sensor1.StopAcquisition();
             }
             //set the button color
             btn_StartAcquisition.BackColor= isStarted? Color.Green : Color.Red;

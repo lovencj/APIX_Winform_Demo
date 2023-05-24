@@ -89,7 +89,7 @@ namespace APIX_Winform_Demo
             Sensor1.NumberOfProfileToCapture = 5000;
             Sensor1.PackSize = 1000;
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
-            Sensor1.SensorInternalTriggerFreq = 11000;
+            Sensor1.SensorInternalTriggerFreq = 3000;
             Sensor1.StartTriggerEnable= true;
             Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
 
@@ -118,7 +118,7 @@ namespace APIX_Winform_Demo
                 log.Info("Packsize:" + Sensor1.PackSize);
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
                 log.Info("exposure and gain:" + Sensor1.ExposuresAndGains.Count);
-                Sensor1.SensorROI = new ROI(0, 4096, 660, 58);
+                Sensor1.SensorROI = new ROI(0, 1920, 542, 90);
                 var s=await Sensor1.StartAcquisition();
                 var s1 = await Sensor1.WriteIO(0);
                 

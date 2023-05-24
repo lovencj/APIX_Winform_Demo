@@ -16,7 +16,6 @@ using Emgu.CV;
 using SmartRay;
 using SmartRay.Api;
 using System.Net;
-using static APIX_Winform_Demo.SRSensorImageHandler;
 using System.Threading;
 
 
@@ -94,7 +93,7 @@ namespace APIX_Winform_Demo
 
             Mat _profileMatimage= new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
             
-            if (ProfileCounter<this._PacketCounter)
+            if (ProfileCounter<=this._PacketCounter)
             {
                 profileimage.PushBack(_profileMatimage);
                 //release unused memory 
@@ -746,21 +745,6 @@ namespace APIX_Winform_Demo
             imagetype = ImageDataType.Invalid;
         }
 
-    }
-
-
-    /// <summary>
-    /// define the image event handle
-    /// </summary>
-    public class SRSensorImageHandler
-    {
-
-
-        public SRSensorImageHandler()
-        {
-
-
-        }
     }
 
     /// <summary>

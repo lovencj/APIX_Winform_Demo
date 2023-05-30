@@ -88,14 +88,14 @@ namespace APIX_Winform_Demo
             Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
             Sensor1.NumberOfProfileToCapture = 5000;
             Sensor1.PackSize = 1000;
-            Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
+            Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
             Sensor1.SensorInternalTriggerFreq = 3000;
-            Sensor1.StartTriggerEnable= true;
+            Sensor1.StartTriggerEnable= false;
             Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
 
             List<ExposureGain> exposureGains = new List<ExposureGain>();
-            exposureGains.Add(new ExposureGain(3d, 3));
-            exposureGains.Add(new ExposureGain(15d, 2));
+            exposureGains.Add(new ExposureGain(10d, 3));
+            //exposureGains.Add(new ExposureGain(15d, 2));
             Sensor1.ExposuresAndGains = exposureGains;
 
             //disable the button
@@ -106,7 +106,7 @@ namespace APIX_Winform_Demo
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //Sensor0.SaveParameterSet("MyParameters.json");
+            //Sensor1.SaveParameterSet("MyParameters.json");
         }
 
         private async void btn_StartAcquisition_Click(object sender, EventArgs e)

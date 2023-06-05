@@ -220,7 +220,7 @@ namespace APIX_Winform_Demo
                 if (_isSensorConnected)
                 {
                     sensor.LoadParameterSetFromFile(value);
-                    sensor.SendParameterSetToSensor(value);
+                    //sensor.SendParameterSetToSensor(value);
                 }
                 _ConfigFilePath = value;
             }

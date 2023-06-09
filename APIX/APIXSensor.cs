@@ -33,6 +33,7 @@ namespace APIX_Winform_Demo
         private Mat profileimage = new Mat();
         private Mat intensityImage = new Mat();
         private Mat laserlinethickness = new Mat();
+        private HiPerfTimer timer = new HiPerfTimer();
 
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace APIX_Winform_Demo
         {
             //throw new NotImplementedException();
             //log.Info(aSensor.ToString() + "," + aInputFlags + "," + aOutputFlags);
-            log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
+            //log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
         }
 
         private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
@@ -621,12 +622,16 @@ namespace APIX_Winform_Demo
             {
                 try
                 {
-                    IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse(_IPAddress), _portNumber);
+                    timer.Start();
+                    IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse(_IPAddress), _portNumber);        
                     TimeSpan timeSpan = new TimeSpan(500);
                     sensor.Connect(ipSensorEndPoint, timeSpan);
+                    timer.Stop();
+                    log.Info("Connect sensor taken:" + timer.Duration + "ms");
+                    timer.Start();
                     sensor.LoadCalibrationDataFromSensor();
                     //sensor.SetHorizontalBinning(BinningMode.Off);
-                    log.Info("Sensor connected!");
+                    log.Info("Load Calibration file taken:"+timer.Duration+"ms\nSensor connected!");
                     //sensor.Granularity
 
                     return true;

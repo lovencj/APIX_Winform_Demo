@@ -31,7 +31,7 @@ namespace APIX_Winform_Demo
         private uint ProfileCounter = 0;
 
         private Mat profileimage = new Mat();
-        private Mat intensityImage=new Mat();
+        private Mat intensityImage = new Mat();
         private Mat laserlinethickness = new Mat();
 
 
@@ -56,12 +56,16 @@ namespace APIX_Winform_Demo
             sensor.OnDisconnected += new Sensor.OnDisconnectedDelegate(OnDisconnectedEvent);
             sensor.OnMessage += new Sensor.OnMessageDelegate(OnSensorMessageEvent);
             sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnLiveImageEvent);
+
             sensor.OnPilImage += Sensor_OnPilImage;
             sensor.OnPilImageNative += Sensor_OnPilImageNative;
             //sensor.OnZilImage += Sensor_OnZilImage;
             sensor.OnZilImageNative += Sensor_OnZilImageNative;
             sensor.OnPointCloudImage += Sensor_OnPointCloudImage;
-            
+            sensor.OnIOChanged += new Sensor.OnIOChangedDelegate(OnSensorIOStatusChangedEvent);
+
+
+
             //intial the sensor parameters
             this._IPAddress = "192.168.178.200";//default IPAddress
             this._portNumber = 40;//default port number;
@@ -77,6 +81,13 @@ namespace APIX_Winform_Demo
 
 
         }
+
+        private void OnSensorIOStatusChangedEvent(Sensor aSensor, byte aInputFlags, byte aOutputFlags)
+        {
+            //throw new NotImplementedException();
+            //log.Info(aSensor.ToString() + "," + aInputFlags + "," + aOutputFlags);
+            log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
+        }
         #region callback functions
 
         private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
@@ -91,9 +102,9 @@ namespace APIX_Winform_Demo
             //log.Info("ZIL native callback");
             SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
 
-            Mat _profileMatimage= new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
-            
-            if (ProfileCounter<=this._PacketCounter)
+            Mat _profileMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
+
+            if (ProfileCounter <= this._PacketCounter)
             {
                 profileimage.PushBack(_profileMatimage);
                 //release unused memory 
@@ -447,8 +458,8 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    _sensorInternalTriggerFreq=(uint)sensor.GetDataTriggerInternalFrequency();
-                        
+                    _sensorInternalTriggerFreq = (uint)sensor.GetDataTriggerInternalFrequency();
+
                 }
                 return _sensorInternalTriggerFreq;
             }
@@ -470,7 +481,7 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    sensor.GetStartTrigger(out StartTriggerSource source,out _StartTriggerEnable,out TriggerEdgeMode edgeMode);
+                    sensor.GetStartTrigger(out StartTriggerSource source, out _StartTriggerEnable, out TriggerEdgeMode edgeMode);
                 }
                 return _StartTriggerEnable;
             }
@@ -494,11 +505,11 @@ namespace APIX_Winform_Demo
                 _exposuresAndgains.Clear();
                 if (_isSensorConnected)
                 {
-                    int exposureCounter= sensor.GetNumberOfExposureTimes();
-                    sensor.GetGain(out bool isGainEnable,out int gainValue);
+                    int exposureCounter = sensor.GetNumberOfExposureTimes();
+                    sensor.GetGain(out bool isGainEnable, out int gainValue);
                     for (int i = 0; i < exposureCounter; i++)
                     {
-                        sensor.GetExposureDuration(i,out double _expo);
+                        sensor.GetExposureDuration(i, out double _expo);
                         _exposuresAndgains.Add(new ExposureGain(_expo, gainValue));
                     }
                 }
@@ -514,14 +525,14 @@ namespace APIX_Winform_Demo
                 if (_isSensorConnected)
                 {
                     int exposureCount = value.Count;
-                    if (exposureCount>1)
+                    if (exposureCount > 1)
                     {
                         sensor.SetNumberOfExposureTimes(exposureCount);
                     }
                     for (int i = 0; i < exposureCount; i++)
                     {
                         sensor.SetExposureDuration(i, value[i].ExposureTime);
-                        if (value[i].Gain>0)
+                        if (value[i].Gain > 0)
                         {
                             sensor.SetGain(true, value[i].Gain);
                         }
@@ -540,7 +551,7 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    _acquistionMode=sensor.GetAcquisitionMode();
+                    _acquistionMode = sensor.GetAcquisitionMode();
                 }
                 return _acquistionMode;
             }
@@ -555,26 +566,49 @@ namespace APIX_Winform_Demo
         }
 
 
-        //private bool _isTriggerOverflow;
+        private BinningMode _horizentalBinningMode;
 
-        //public bool isTriggerOverflow
-        //{
-        //    get
-        //    {
-        //        if (_isSensorConnected)
-        //        { 
-        //            _isTriggerOverflow=sensor.max
-        //        }
-        //        return _isTriggerOverflow;
-        //    }
-        //    set
-        //    {
-        //        _isTriggerOverflow = value;
-        //    }
-        //}
+        public BinningMode HorizentalBinningMode
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _horizentalBinningMode = sensor.GetHorizontalBinning();
+                }
+                return _horizentalBinningMode;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetHorizontalBinning(value);
+                }
+                _horizentalBinningMode = value;
+            }
+        }
 
+        private BinningMode _verticalBinningeMode;
 
-
+        public BinningMode VerticalBinningMode
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _verticalBinningeMode = sensor.GetVerticalBinning();
+                }
+                return _verticalBinningeMode;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetVerticalBinning(value);
+                }
+                _verticalBinningeMode = value;
+            }
+        }
 
 
 
@@ -591,7 +625,7 @@ namespace APIX_Winform_Demo
                     TimeSpan timeSpan = new TimeSpan(500);
                     sensor.Connect(ipSensorEndPoint, timeSpan);
                     sensor.LoadCalibrationDataFromSensor();
-                    
+                    //sensor.SetHorizontalBinning(BinningMode.Off);
                     log.Info("Sensor connected!");
                     //sensor.Granularity
 
@@ -674,18 +708,18 @@ namespace APIX_Winform_Demo
         }
 
 
-        public Task<bool> WriteIO(uint Output_port_number)
+        public Task<bool> WriteIO(DigitalOutput Output_port_number)
         {
             Task<bool> writeIotask = new Task<bool>(() =>
             {
-                bool succeeded=false;
+                bool succeeded = false;
                 try
                 {
-                    sensor.SetDigitalOutput(DigitalOutput.Channel2, true);
+                    sensor.SetDigitalOutput(Output_port_number, true);
                     Thread.Sleep(50);
-                    sensor.SetDigitalOutput(DigitalOutput.Channel2,false);
-                    
-                    succeeded=true;
+                    sensor.SetDigitalOutput(Output_port_number, false);
+
+                    succeeded = true;
                 }
                 catch (Exception ce)
                 {
@@ -763,13 +797,13 @@ namespace APIX_Winform_Demo
             }
             set
             {
-                if (_exposureTime >0)
+                if (_exposureTime > 0)
                 {
                     _exposureTime = value;
                 }
                 else
                 {
-                    _exposureTime= 10;
+                    _exposureTime = 10;
                 }
             }
         }
@@ -792,7 +826,7 @@ namespace APIX_Winform_Demo
                 else
                 {
                     _gain = 0;
-                }               
+                }
             }
         }
 
@@ -801,7 +835,7 @@ namespace APIX_Winform_Demo
         /// </summary>
         /// <param name="exposure">exposure time, value from 0 to 1000</param>
         /// <param name="gain"></param>
-        public ExposureGain(double exposure=10, int gain=0)
+        public ExposureGain(double exposure = 10, int gain = 0)
         {
             this._exposureTime = exposure;
             this._gain = gain;

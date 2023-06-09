@@ -32,6 +32,7 @@ namespace APIX_Winform_Demo
     {
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private bool isStarted=false;
+        private HiPerfTimer HiPerfTimer = new HiPerfTimer();
 
         APIXSensor Sensor1 = new APIXSensor();
 
@@ -39,8 +40,10 @@ namespace APIX_Winform_Demo
         {
             InitializeComponent();
             log.Info("The UI initialed!");
+            HiPerfTimer.Start();
             initSR_APIx();
-
+            HiPerfTimer.Stop();
+            log.Info("Initial APIx taken:" + HiPerfTimer.Duration+"ms");
 
 
         }
@@ -61,7 +64,7 @@ namespace APIX_Winform_Demo
         private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
             log.Info("Acquisition completed, trigger the sensor again and display");
-            Sensor1.WriteIO(0);
+            Sensor1.WriteIO(DigitalOutput.Channel1);
 
             //Cross thread to display image
             new Task(new Action(() =>
@@ -83,20 +86,26 @@ namespace APIX_Winform_Demo
 
         private async void btn_InitialSensor_Click(object sender, EventArgs e)
         {
-
+            HiPerfTimer.Start();
             var result= await Sensor1.Connect();
+            HiPerfTimer.Stop();
+            log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
+            HiPerfTimer.Start();
             Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-            Sensor1.NumberOfProfileToCapture = 5000;
-            Sensor1.PackSize = 1000;
-            Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
+            Sensor1.NumberOfProfileToCapture = 1000;
+            Sensor1.PackSize = 100;
+            Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
             Sensor1.SensorInternalTriggerFreq = 3000;
-            Sensor1.StartTriggerEnable= false;
+            Sensor1.StartTriggerEnable= Enabled;
             Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
-
+            Sensor1.HorizentalBinningMode = BinningMode.X2;
+            Sensor1.VerticalBinningMode = BinningMode.X2;
             List<ExposureGain> exposureGains = new List<ExposureGain>();
             exposureGains.Add(new ExposureGain(10d, 3));
-            //exposureGains.Add(new ExposureGain(15d, 2));
+            exposureGains.Add(new ExposureGain(50d, 2));
             Sensor1.ExposuresAndGains = exposureGains;
+            HiPerfTimer.Stop();
+            log.Info("set sensor parameters taken:" + HiPerfTimer.Duration + "ms");
 
             //disable the button
             btn_InitialSensor.Enabled = false;
@@ -118,9 +127,12 @@ namespace APIX_Winform_Demo
                 log.Info("Packsize:" + Sensor1.PackSize);
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
                 log.Info("exposure and gain:" + Sensor1.ExposuresAndGains.Count);
-                Sensor1.SensorROI = new ROI(0, 1920, 542, 90);
+                Sensor1.SensorROI = new ROI(0, 4096, 498, 370);
                 var s=await Sensor1.StartAcquisition();
-                var s1 = await Sensor1.WriteIO(0);
+
+                log.Info(Sensor1.HorizentalBinningMode);
+                log.Info(Sensor1.VerticalBinningMode);
+                //var s1 = await Sensor1.WriteIO(DigitalOutput.Channel2);
                 
             }
             else if (!isStarted)

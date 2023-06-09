@@ -81,6 +81,7 @@ namespace APIX_Winform_Demo
 
 
         }
+        #region callback functions
 
         private void OnSensorIOStatusChangedEvent(Sensor aSensor, byte aInputFlags, byte aOutputFlags)
         {
@@ -88,7 +89,6 @@ namespace APIX_Winform_Demo
             //log.Info(aSensor.ToString() + "," + aInputFlags + "," + aOutputFlags);
             log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
         }
-        #region callback functions
 
         private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
         {

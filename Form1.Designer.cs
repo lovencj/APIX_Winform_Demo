@@ -40,13 +40,16 @@ namespace APIX_Winform_Demo
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tBx_PacketTimeout = new System.Windows.Forms.TextBox();
+            this.tBx_PacketSize = new System.Windows.Forms.TextBox();
+            this.tbx_NumberOfProfile = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btn_InitialSensor = new System.Windows.Forms.Button();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.tbx_SensorTempetature = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -55,6 +58,7 @@ namespace APIX_Winform_Demo
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -69,6 +73,7 @@ namespace APIX_Winform_Demo
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.groupBox4);
             this.splitContainer1.Panel2.Controls.Add(this.button1);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox3);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox2);
@@ -121,6 +126,7 @@ namespace APIX_Winform_Demo
             this.btn_SimulateTrigger.TabIndex = 0;
             this.btn_SimulateTrigger.Text = "Simulate Start Trigger(Outpu2-->Input1)";
             this.btn_SimulateTrigger.UseVisualStyleBackColor = true;
+            this.btn_SimulateTrigger.Click += new System.EventHandler(this.btn_SimulateTrigger_Click);
             // 
             // btn_StartAcquisition
             // 
@@ -141,9 +147,9 @@ namespace APIX_Winform_Demo
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Controls.Add(this.textBox3);
-            this.groupBox2.Controls.Add(this.textBox2);
-            this.groupBox2.Controls.Add(this.textBox1);
+            this.groupBox2.Controls.Add(this.tBx_PacketTimeout);
+            this.groupBox2.Controls.Add(this.tBx_PacketSize);
+            this.groupBox2.Controls.Add(this.tbx_NumberOfProfile);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(4, 93);
             this.groupBox2.Name = "groupBox2";
@@ -179,26 +185,29 @@ namespace APIX_Winform_Demo
             this.label2.TabIndex = 2;
             this.label2.Text = "Packsize:";
             // 
-            // textBox3
+            // tBx_PacketTimeout
             // 
-            this.textBox3.Location = new System.Drawing.Point(96, 100);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(160, 21);
-            this.textBox3.TabIndex = 1;
+            this.tBx_PacketTimeout.Location = new System.Drawing.Point(96, 100);
+            this.tBx_PacketTimeout.Name = "tBx_PacketTimeout";
+            this.tBx_PacketTimeout.Size = new System.Drawing.Size(160, 21);
+            this.tBx_PacketTimeout.TabIndex = 1;
+            this.tBx_PacketTimeout.TextChanged += new System.EventHandler(this.tBx_PacketTimeout_TextChanged);
             // 
-            // textBox2
+            // tBx_PacketSize
             // 
-            this.textBox2.Location = new System.Drawing.Point(71, 65);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(253, 21);
-            this.textBox2.TabIndex = 1;
+            this.tBx_PacketSize.Location = new System.Drawing.Point(71, 65);
+            this.tBx_PacketSize.Name = "tBx_PacketSize";
+            this.tBx_PacketSize.Size = new System.Drawing.Size(253, 21);
+            this.tBx_PacketSize.TabIndex = 1;
+            this.tBx_PacketSize.TextChanged += new System.EventHandler(this.tBx_PacketSize_TextChanged);
             // 
-            // textBox1
+            // tbx_NumberOfProfile
             // 
-            this.textBox1.Location = new System.Drawing.Point(7, 37);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(317, 21);
-            this.textBox1.TabIndex = 1;
+            this.tbx_NumberOfProfile.Location = new System.Drawing.Point(7, 37);
+            this.tbx_NumberOfProfile.Name = "tbx_NumberOfProfile";
+            this.tbx_NumberOfProfile.Size = new System.Drawing.Size(317, 21);
+            this.tbx_NumberOfProfile.TabIndex = 1;
+            this.tbx_NumberOfProfile.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label1
             // 
@@ -241,6 +250,34 @@ namespace APIX_Winform_Demo
             this.vScrollBar1.Size = new System.Drawing.Size(20, 729);
             this.vScrollBar1.TabIndex = 0;
             // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.tbx_SensorTempetature);
+            this.groupBox4.Controls.Add(this.label5);
+            this.groupBox4.Location = new System.Drawing.Point(4, 248);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(324, 140);
+            this.groupBox4.TabIndex = 5;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Sensor Info";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(9, 21);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(119, 12);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Sensor Temperature:";
+            // 
+            // tbx_SensorTempetature
+            // 
+            this.tbx_SensorTempetature.Enabled = false;
+            this.tbx_SensorTempetature.Location = new System.Drawing.Point(135, 18);
+            this.tbx_SensorTempetature.Name = "tbx_SensorTempetature";
+            this.tbx_SensorTempetature.Size = new System.Drawing.Size(183, 21);
+            this.tbx_SensorTempetature.TabIndex = 1;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -258,6 +295,8 @@ namespace APIX_Winform_Demo
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -271,16 +310,19 @@ namespace APIX_Winform_Demo
         private System.Windows.Forms.Button btn_InitialSensor;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox tbx_NumberOfProfile;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox tBx_PacketSize;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox tBx_PacketTimeout;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button btn_StartAcquisition;
         private System.Windows.Forms.Button btn_SimulateTrigger;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.TextBox tbx_SensorTempetature;
+        private System.Windows.Forms.Label label5;
     }
 }
 

@@ -101,21 +101,29 @@ namespace APIX_Winform_Demo
             ProfileCounter++;
 
             //log.Info("ZIL native callback");
-            SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
 
             Mat _profileMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
+            profileimage.PushBack(_profileMatimage);
+            //release unused memory 
+            Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
+            Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
+            Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
+            log.Info("Native ZIL image height:" + profileimage.Height);
 
-            if (ProfileCounter <= this._PacketCounter)
-            {
-                profileimage.PushBack(_profileMatimage);
-                //release unused memory 
-                Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
-                Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
-                Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
+            //if (ProfileCounter <= this._PacketCounter)
+            //if (profileimage.Height<_NumberOfProfileToCapture)
+            //{
+            //    profileimage.PushBack(_profileMatimage);
+            //    //release unused memory 
+            //    Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
+            //    Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
+            //    Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
+            //    log.Info("Native ZIL image height:"+profileimage.Height);
 
-            }
-            else
+            //}
+            if (profileimage.Height == _NumberOfProfileToCapture)
             {
+                SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
                 sRImageHandlerArgument.profile_image = profileimage.Clone();
                 //sRImageHandlerArgument.intensity_image = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aIntensityImageData, aWidth * sizeof(UInt16));
                 //sRImageHandlerArgument.laserlinethickness_image = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aLaserLineThicknessImageData, aWidth * sizeof(UInt16));
@@ -612,6 +620,82 @@ namespace APIX_Winform_Demo
         }
 
 
+        private string _SensorFWVersion;
+
+        public string SensorFWVersion
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _SensorFWVersion = sensor.FirmwareVersion;
+                }
+                return _SensorFWVersion;
+            }
+        }
+
+
+        private float _sensorTempearture;
+
+        public float SensorTemperature
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _sensorTempearture = sensor.GetTemperature();
+                }
+                return _sensorTempearture;
+            }
+
+        }
+
+
+        private float _tiltAnglePitch;
+
+        public float TiltAnglePitch
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _tiltAnglePitch = sensor.GetTiltCorrectionPitch();
+                }
+                return _tiltAnglePitch;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetTiltCorrectionPitch(value);
+                }
+                _tiltAnglePitch = value;
+            }
+        }
+
+
+        private float _tiltAngleYaw;
+
+        public float TiltAngleYaw
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _tiltAngleYaw = sensor.GetTiltCorrectionYaw();
+                }
+                return _tiltAngleYaw;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetTiltCorrectionYaw(value);
+                }
+                _tiltAngleYaw = value;
+            }
+        }
+
 
 
         #endregion
@@ -623,15 +707,15 @@ namespace APIX_Winform_Demo
                 try
                 {
                     timer.Start();
-                    IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse(_IPAddress), _portNumber);        
-                    TimeSpan timeSpan = new TimeSpan(500);
+                    IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse(_IPAddress), _portNumber);
+                    TimeSpan timeSpan = new TimeSpan(15000);
                     sensor.Connect(ipSensorEndPoint, timeSpan);
                     timer.Stop();
                     log.Info("Connect sensor taken:" + timer.Duration + "ms");
                     timer.Start();
                     sensor.LoadCalibrationDataFromSensor();
                     //sensor.SetHorizontalBinning(BinningMode.Off);
-                    log.Info("Load Calibration file taken:"+timer.Duration+"ms\nSensor connected!");
+                    log.Info("Load Calibration file taken:" + timer.Duration + "ms\nSensor connected!");
                     //sensor.Granularity
 
                     return true;
@@ -721,7 +805,7 @@ namespace APIX_Winform_Demo
                 try
                 {
                     sensor.SetDigitalOutput(Output_port_number, true);
-                    Thread.Sleep(50);
+                    Thread.Sleep(150);
                     sensor.SetDigitalOutput(Output_port_number, false);
 
                     succeeded = true;

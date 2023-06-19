@@ -21,6 +21,7 @@ using Emgu.CV;
 using SmartRay;
 using SmartRay.Api;
 using System.Net;
+using System.Threading;
 
 
 
@@ -31,7 +32,7 @@ namespace APIX_Winform_Demo
     public partial class Form1 : Form
     {
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private bool isStarted=false;
+        private bool isStarted = false;
         private HiPerfTimer HiPerfTimer = new HiPerfTimer();
 
         APIXSensor Sensor1 = new APIXSensor();
@@ -39,11 +40,18 @@ namespace APIX_Winform_Demo
         public Form1()
         {
             InitializeComponent();
+            tbx_NumberOfProfile.Enabled = false;
+            tBx_PacketSize.Enabled = false;
+            tBx_PacketTimeout.Enabled = false;
+
+
+
+
             log.Info("The UI initialed!");
             HiPerfTimer.Start();
             initSR_APIx();
             HiPerfTimer.Stop();
-            log.Info("Initial APIx taken:" + HiPerfTimer.Duration+"ms");
+            log.Info("Initial APIx taken:" + HiPerfTimer.Duration + "ms");
 
 
         }
@@ -64,7 +72,7 @@ namespace APIX_Winform_Demo
         private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
             log.Info("Acquisition completed, trigger the sensor again and display");
-            Sensor1.WriteIO(DigitalOutput.Channel1);
+            Sensor1.WriteIO(DigitalOutput.Channel2);
 
             //Cross thread to display image
             new Task(new Action(() =>
@@ -74,7 +82,16 @@ namespace APIX_Winform_Demo
                     //cv_imageBox1.Image.Dispose();
                     cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
                 }));
+
+                tbx_SensorTempetature.Invoke((Action)(() =>
+                {
+                    tbx_SensorTempetature.Text = Sensor1.SensorTemperature.ToString("0.00") + "℃";
+                }));
             })).Start();
+
+            //Thread.Sleep(300);
+
+
             GC.Collect();
         }
 
@@ -87,7 +104,8 @@ namespace APIX_Winform_Demo
         private async void btn_InitialSensor_Click(object sender, EventArgs e)
         {
             HiPerfTimer.Start();
-            var result= await Sensor1.Connect();
+            var result = await Sensor1.Connect();
+            log.Info(Sensor1.SensorFWVersion);
             HiPerfTimer.Stop();
             log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
             HiPerfTimer.Start();
@@ -95,20 +113,31 @@ namespace APIX_Winform_Demo
             Sensor1.NumberOfProfileToCapture = 1000;
             Sensor1.PackSize = 100;
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
-            Sensor1.SensorInternalTriggerFreq = 3000;
-            Sensor1.StartTriggerEnable= Enabled;
+            Sensor1.SensorInternalTriggerFreq = 1500;
+            Sensor1.StartTriggerEnable = Enabled;
             Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
-            Sensor1.HorizentalBinningMode = BinningMode.X2;
-            Sensor1.VerticalBinningMode = BinningMode.X2;
+            Sensor1.TiltAnglePitch = 0;
+            Sensor1.TiltAngleYaw = -19;
+            //Sensor1.HorizentalBinningMode = BinningMode.X2;
+            //Sensor1.VerticalBinningMode = BinningMode.X2;
             List<ExposureGain> exposureGains = new List<ExposureGain>();
-            exposureGains.Add(new ExposureGain(10d, 3));
-            exposureGains.Add(new ExposureGain(50d, 2));
+            exposureGains.Add(new ExposureGain(4d, 3));
+            exposureGains.Add(new ExposureGain(60d, 3));
             Sensor1.ExposuresAndGains = exposureGains;
             HiPerfTimer.Stop();
             log.Info("set sensor parameters taken:" + HiPerfTimer.Duration + "ms");
 
             //disable the button
             btn_InitialSensor.Enabled = false;
+            tbx_NumberOfProfile.Enabled = true;
+            tBx_PacketSize.Enabled = true;
+            tBx_PacketTimeout.Enabled = true;
+
+            //display the parameters
+            tbx_NumberOfProfile.Text = Sensor1.NumberOfProfileToCapture.ToString();
+            tBx_PacketSize.Text = Sensor1.PackSize.ToString();
+            tBx_PacketTimeout.Text = Sensor1.PacketTimeout.ToString();
+
             //Sensor1.ExposuresAndGains.Add(new ExposureGain(30d, 2));
 
         }
@@ -127,22 +156,62 @@ namespace APIX_Winform_Demo
                 log.Info("Packsize:" + Sensor1.PackSize);
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
                 log.Info("exposure and gain:" + Sensor1.ExposuresAndGains.Count);
-                Sensor1.SensorROI = new ROI(0, 4096, 498, 370);
-                var s=await Sensor1.StartAcquisition();
+                log.Info("Sensor acquisition mode:" + Sensor1.acquisitionMode);
+                log.Info("Sensor pitch angle:"+Sensor1.TiltAnglePitch);
+                log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
+                Sensor1.SensorROI = new ROI(0, 1920, 284, 480);
+                var s = await Sensor1.StartAcquisition();
 
-                log.Info(Sensor1.HorizentalBinningMode);
-                log.Info(Sensor1.VerticalBinningMode);
-                //var s1 = await Sensor1.WriteIO(DigitalOutput.Channel2);
-                
+                //log.Info(Sensor1.HorizentalBinningMode);
+                //log.Info(Sensor1.VerticalBinningMode);
+                // var s1 = await Sensor1.WriteIO(DigitalOutput.Channel2);
+
             }
             else if (!isStarted)
             {
                 log.Info("Sensor stop acquisition");
-                var s1=await Sensor1.StopAcquisition();
+                var s1 = await Sensor1.StopAcquisition();
             }
+
+            tbx_NumberOfProfile.Enabled = !isStarted;
+            tBx_PacketSize.Enabled = !isStarted;
+            tBx_PacketTimeout.Enabled = !isStarted;
+
+
+
             //set the button color
-            btn_StartAcquisition.BackColor= isStarted? Color.Green : Color.Red;
+            btn_StartAcquisition.BackColor = isStarted ? Color.Green : Color.Red;
             btn_StartAcquisition.Text = isStarted ? "Sensor running" : "Sensor Stop";
+        }
+
+        private void btn_SimulateTrigger_Click(object sender, EventArgs e)
+        {
+            Sensor1.WriteIO(DigitalOutput.Channel2);
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (Sensor1.isSensorConnected)
+            {
+                Sensor1.NumberOfProfileToCapture = uint.Parse(tbx_NumberOfProfile.Text);
+            }
+        }
+
+        private void tBx_PacketSize_TextChanged(object sender, EventArgs e)
+        {
+            if (Sensor1.isSensorConnected)
+            {
+                Sensor1.PackSize = uint.Parse(tBx_PacketSize.Text);
+            }
+        }
+
+        private void tBx_PacketTimeout_TextChanged(object sender, EventArgs e)
+        {
+            if (Sensor1.isSensorConnected)
+            {
+                Sensor1.PacketTimeout = TimeSpan.Parse(tBx_PacketTimeout.Text);
+            }
         }
     }
 }

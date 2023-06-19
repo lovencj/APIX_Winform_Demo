@@ -36,7 +36,7 @@ namespace APIX_Winform_Demo
         private HiPerfTimer HiPerfTimer = new HiPerfTimer();
 
         APIXSensor Sensor1 = new APIXSensor();
-
+        SensorHelper sensorHelper = new SensorHelper();
         public Form1()
         {
             InitializeComponent();
@@ -54,6 +54,9 @@ namespace APIX_Winform_Demo
             log.Info("Initial APIx taken:" + HiPerfTimer.Duration + "ms");
 
 
+
+
+
         }
 
 
@@ -69,10 +72,12 @@ namespace APIX_Winform_Demo
             return true;
         }
 
-        private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
+        private async void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
             log.Info("Acquisition completed, trigger the sensor again and display");
-            Sensor1.WriteIO(DigitalOutput.Channel2);
+            // Sensor1.WriteIO(DigitalOutput.Channel2);
+
+            var tempSensor = sensor as APIXSensor;
 
             //Cross thread to display image
             new Task(new Action(() =>
@@ -80,15 +85,56 @@ namespace APIX_Winform_Demo
                 cv_imageBox1.Invoke(new Action(() =>
                 {
                     //cv_imageBox1.Image.Dispose();
-                    cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
+                    switch (tempSensor.AcquisitionType)
+                    {
+                        case ImageAcquisitionType.Profile:
+                            cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
+
+                            break;
+                        case ImageAcquisitionType.ProfileIntensityLaserLineThickness:
+                            cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
+
+                            break;
+                        case ImageAcquisitionType.ZMap:
+                            cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
+
+                            break;
+                        case ImageAcquisitionType.ZMapIntensityLaserLineThickness:
+                            cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
+
+                            break;
+                        case ImageAcquisitionType.LiveImage:
+                            cv_imageBox1.Image = SRimageHandlerArgument.liveimage;
+
+                            break;
+                        case ImageAcquisitionType.PointCloud:
+                            cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
+                            break;
+                        default:
+                            break;
+                    }
+
+
                 }));
 
                 tbx_SensorTempetature.Invoke((Action)(() =>
                 {
-                    tbx_SensorTempetature.Text = Sensor1.SensorTemperature.ToString("0.00") + "℃";
+                    tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";
                 }));
             })).Start();
 
+            if (tempSensor.AcquisitionType == ImageAcquisitionType.PointCloud)
+            {
+                string filename = DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.ply";
+
+                HiPerfTimer.Start();
+                var a = await sensorHelper.SaveToPly(filename, SRimageHandlerArgument.pointcloud);
+                HiPerfTimer.Stop();
+                log.Info("Save PLY taken:" + HiPerfTimer.Duration);
+            }
+
+            //then Start trigger again
+            Sensor1.WriteIO(DigitalOutput.Channel2);
             //Thread.Sleep(300);
 
 
@@ -109,17 +155,22 @@ namespace APIX_Winform_Demo
             HiPerfTimer.Stop();
             log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
             HiPerfTimer.Start();
-            Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
+            Sensor1.AcquisitionType = ImageAcquisitionType.PointCloud;
             Sensor1.NumberOfProfileToCapture = 1000;
             Sensor1.PackSize = 100;
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
             Sensor1.SensorInternalTriggerFreq = 1500;
             Sensor1.StartTriggerEnable = Enabled;
             Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
-            Sensor1.TiltAnglePitch = 0;
+            Sensor1.TiltAnglePitch = -19;
             Sensor1.TiltAngleYaw = -19;
-            //Sensor1.HorizentalBinningMode = BinningMode.X2;
-            //Sensor1.VerticalBinningMode = BinningMode.X2;
+            Sensor1.TransportResolution = 0.019f;
+            if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
+            {
+                Sensor1.HorizentalBinningMode = BinningMode.X2;
+                Sensor1.VerticalBinningMode = BinningMode.X2;
+
+            }
             List<ExposureGain> exposureGains = new List<ExposureGain>();
             exposureGains.Add(new ExposureGain(4d, 3));
             exposureGains.Add(new ExposureGain(60d, 3));
@@ -145,6 +196,7 @@ namespace APIX_Winform_Demo
         private void button1_Click(object sender, EventArgs e)
         {
             //Sensor1.SaveParameterSet("MyParameters.json");
+            Sensor1.SaveSensorParameters(Sensor1.SensorModel.Substring(0,12)+"_"+ DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.json");
         }
 
         private async void btn_StartAcquisition_Click(object sender, EventArgs e)
@@ -157,13 +209,15 @@ namespace APIX_Winform_Demo
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
                 log.Info("exposure and gain:" + Sensor1.ExposuresAndGains.Count);
                 log.Info("Sensor acquisition mode:" + Sensor1.acquisitionMode);
-                log.Info("Sensor pitch angle:"+Sensor1.TiltAnglePitch);
+                log.Info("Sensor pitch angle:" + Sensor1.TiltAnglePitch);
                 log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
                 Sensor1.SensorROI = new ROI(0, 1920, 284, 480);
                 var s = await Sensor1.StartAcquisition();
-
-                //log.Info(Sensor1.HorizentalBinningMode);
-                //log.Info(Sensor1.VerticalBinningMode);
+                if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
+                {
+                    log.Info(Sensor1.HorizentalBinningMode);
+                    log.Info(Sensor1.VerticalBinningMode);
+                }
                 // var s1 = await Sensor1.WriteIO(DigitalOutput.Channel2);
 
             }

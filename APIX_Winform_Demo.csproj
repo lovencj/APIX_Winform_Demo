@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="APIX\APIXClass.cs" />
     <Compile Include="APIX\APIXSensor.cs" />
+    <Compile Include="APIX\SensorHelper.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

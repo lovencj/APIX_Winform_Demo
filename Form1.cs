@@ -75,7 +75,7 @@ namespace APIX_Winform_Demo
         private async void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
             log.Info("Acquisition completed, trigger the sensor again and display");
-            // Sensor1.WriteIO(DigitalOutput.Channel2);
+            //Sensor1.WriteIO(DigitalOutput.Channel2);
 
             var tempSensor = sensor as APIXSensor;
 
@@ -125,12 +125,12 @@ namespace APIX_Winform_Demo
 
             if (tempSensor.AcquisitionType == ImageAcquisitionType.PointCloud)
             {
-                string filename = DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.ply";
+                //string filename = DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.ply";
 
-                HiPerfTimer.Start();
-                var a = await sensorHelper.SaveToPly(filename, SRimageHandlerArgument.pointcloud);
-                HiPerfTimer.Stop();
-                log.Info("Save PLY taken:" + HiPerfTimer.Duration);
+                //HiPerfTimer.Start();
+                //var a = await sensorHelper.SaveToPly(filename, SRimageHandlerArgument.pointcloud);
+                //HiPerfTimer.Stop();
+                //log.Info("Save PLY taken:" + HiPerfTimer.Duration);
             }
 
             //then Start trigger again
@@ -156,14 +156,14 @@ namespace APIX_Winform_Demo
             log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
             HiPerfTimer.Start();
             Sensor1.AcquisitionType = ImageAcquisitionType.PointCloud;
-            Sensor1.NumberOfProfileToCapture = 1000;
-            Sensor1.PackSize = 100;
+            Sensor1.NumberOfProfileToCapture = 5000;
+            Sensor1.PackSize = 500;
             Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
             Sensor1.SensorInternalTriggerFreq = 1500;
-            Sensor1.StartTriggerEnable = Enabled;
+            Sensor1.StartTriggerEnable = false;
             Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
-            Sensor1.TiltAnglePitch = -19;
-            Sensor1.TiltAngleYaw = -19;
+            Sensor1.TiltAnglePitch = -19f;
+            Sensor1.TiltAngleYaw = -19f;
             Sensor1.TransportResolution = 0.019f;
             if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
             {
@@ -173,7 +173,7 @@ namespace APIX_Winform_Demo
             }
             List<ExposureGain> exposureGains = new List<ExposureGain>();
             exposureGains.Add(new ExposureGain(4d, 3));
-            exposureGains.Add(new ExposureGain(60d, 3));
+            exposureGains.Add(new ExposureGain(10d, 3));
             Sensor1.ExposuresAndGains = exposureGains;
             HiPerfTimer.Stop();
             log.Info("set sensor parameters taken:" + HiPerfTimer.Duration + "ms");
@@ -204,6 +204,7 @@ namespace APIX_Winform_Demo
             isStarted = !isStarted;
             if (isStarted)
             {
+                Sensor1.clearbuffer();
                 log.Info("Number of profile to capture:" + Sensor1.NumberOfProfileToCapture);
                 log.Info("Packsize:" + Sensor1.PackSize);
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
@@ -211,7 +212,7 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor acquisition mode:" + Sensor1.acquisitionMode);
                 log.Info("Sensor pitch angle:" + Sensor1.TiltAnglePitch);
                 log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
-                Sensor1.SensorROI = new ROI(0, 1920, 284, 480);
+                Sensor1.SensorROI = new ROI(0, 1920, 284, 96);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 {
@@ -225,6 +226,7 @@ namespace APIX_Winform_Demo
             {
                 log.Info("Sensor stop acquisition");
                 var s1 = await Sensor1.StopAcquisition();
+                Sensor1.clearbuffer();
             }
 
             tbx_NumberOfProfile.Enabled = !isStarted;

@@ -97,8 +97,9 @@ namespace APIX_Winform_Demo
         private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
         {
             ProfileCounter++;
+            timer.Start();
             point3Fs.Add(aPointCloudImageData);
-            log.Info("PointCloud callback" + intensityImage.Height);
+            //log.Info("PointCloud callback" + intensityImage.Height);
 
             unsafe
             {
@@ -135,6 +136,8 @@ namespace APIX_Winform_Demo
                 laserlinethicknessImage = new Mat();
                 point3Fs.Clear();
                 ProfileCounter = 0;
+                timer.Stop();
+              //  log.Info("PointCloud taken:" + timer.Duration + "ms");
 
             }
 
@@ -411,7 +414,7 @@ namespace APIX_Winform_Demo
                 if (_isSensorConnected)
                 {
                     _AcquisitionType = sensor.GetImageAcquisitionType();
-                    log.Info("Get Image Acquisition Type:" + _AcquisitionType.ToString());
+                    //log.Info("Get Image Acquisition Type:" + _AcquisitionType.ToString());
                 }
                 else
                     log.Error("sensor not connected!");
@@ -994,7 +997,7 @@ namespace APIX_Winform_Demo
                 try
                 {
                     sensor.SetDigitalOutput(Output_port_number, true);
-                    Thread.Sleep(150);
+                    Thread.Sleep(10);
                     sensor.SetDigitalOutput(Output_port_number, false);
 
                     succeeded = true;
@@ -1025,6 +1028,20 @@ namespace APIX_Winform_Demo
             SaveParaTask.Start();
             return SaveParaTask;
         }
+
+        public void clearbuffer()
+        {
+            ProfileCounter = 0;
+
+            profileimage.Dispose(); profileimage = new Mat();
+            intensityImage.Dispose(); intensityImage = new Mat();
+            laserlinethicknessImage.Dispose(); laserlinethicknessImage = new Mat();
+
+            //test for pointcloud data management list 
+            point3Fs.Clear();
+        }
+
+
         #endregion
 
     }

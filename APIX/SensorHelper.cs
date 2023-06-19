@@ -15,7 +15,7 @@ using SmartRay.Api;
 namespace APIX_Winform_Demo
 {
     /******************************************************************************
-     *                               SmartRay With Halcon/opencv Sample           *
+     *                               SmartRay Save file          Sample           *
      *----------------------------------------------------------------------------*
      * Copyright (c) SmartRay GmbH 2020.  All Rights Reserved.		              *
      *----------------------------------------------------------------------------*
@@ -24,7 +24,7 @@ namespace APIX_Winform_Demo
     /**
      * @file SensorHelper.cs
      * @author SmartRay GmbH
-     * @date 2020
+     * @date 2023.06
      * @brief This is the sample for convert SmartRay data to Halcon,Opencv data format and etc
      * @see http://www.smartray.com/
      */

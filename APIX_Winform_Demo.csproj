@@ -53,9 +53,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\SmartRaySDK 6.0.1.19\bin\x64\SmartRay_api_csharp-x64.dll</HintPath>
     </Reference>
-    <Reference Include="SR_Render_Control">
-      <HintPath>..\..\Download\Graph3D_Render_Control\SR_Render_Control\bin\Release\SR_Render_Control.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
@@ -131,7 +128,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Download\Graph3D_Render_Control\SR_Render_Control\SR_Render_Control.csproj">
+      <Project>{0bea9559-d8a1-42fc-9b96-bcf823009375}</Project>
+      <Name>SR_Render_Control</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Emgu.CV.runtime.windows.4.4.0.4061\build\Emgu.CV.runtime.windows.targets" Condition="Exists('packages\Emgu.CV.runtime.windows.4.4.0.4061\build\Emgu.CV.runtime.windows.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -66,8 +66,6 @@ namespace APIX_Winform_Demo
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btn_InitialSensor = new System.Windows.Forms.Button();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
-            this.smartRayApiExceptionBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.cv_imageBox1 = new Emgu.CV.UI.ImageBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -79,10 +77,6 @@ namespace APIX_Winform_Demo
             this.gbx_StartAcquisition.SuspendLayout();
             this.gbx_SensorPar.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.smartRayApiExceptionBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -94,7 +88,7 @@ namespace APIX_Winform_Demo
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+            this.splitContainer1.Panel1.Controls.Add(this.cv_imageBox1);
             // 
             // splitContainer1.Panel2
             // 
@@ -474,29 +468,12 @@ namespace APIX_Winform_Demo
             this.vScrollBar1.Size = new System.Drawing.Size(20, 729);
             this.vScrollBar1.TabIndex = 0;
             // 
-            // smartRayApiExceptionBindingSource
-            // 
-            this.smartRayApiExceptionBindingSource.DataSource = typeof(SmartRay.Api.SmartRayApiException);
-            // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.cv_imageBox1);
-            this.splitContainer2.Size = new System.Drawing.Size(989, 729);
-            this.splitContainer2.SplitterDistance = 572;
-            this.splitContainer2.TabIndex = 0;
-            // 
             // cv_imageBox1
             // 
             this.cv_imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cv_imageBox1.Location = new System.Drawing.Point(0, 0);
             this.cv_imageBox1.Name = "cv_imageBox1";
-            this.cv_imageBox1.Size = new System.Drawing.Size(572, 729);
+            this.cv_imageBox1.Size = new System.Drawing.Size(989, 729);
             this.cv_imageBox1.TabIndex = 2;
             this.cv_imageBox1.TabStop = false;
             // 
@@ -522,10 +499,6 @@ namespace APIX_Winform_Demo
             this.gbx_SensorPar.ResumeLayout(false);
             this.gbx_SensorPar.PerformLayout();
             this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.smartRayApiExceptionBindingSource)).EndInit();
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).EndInit();
             this.ResumeLayout(false);
 
@@ -568,9 +541,7 @@ namespace APIX_Winform_Demo
         private System.Windows.Forms.TextBox tbx_SensorModel;
         private System.Windows.Forms.TextBox tbx_APIXVersion;
         private System.Windows.Forms.ComboBox comboBox_ImageType;
-        private System.Windows.Forms.BindingSource smartRayApiExceptionBindingSource;
         private System.Windows.Forms.CheckBox ckb_EnableSaveFiles;
-        private System.Windows.Forms.SplitContainer splitContainer2;
         private Emgu.CV.UI.ImageBox cv_imageBox1;
     }
 }

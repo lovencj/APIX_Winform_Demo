@@ -23,6 +23,9 @@ using SmartRay.Api;
 using System.Net;
 using System.Threading;
 using Emgu.CV.Flann;
+using SR_Render_Control;
+using static SR_Render_Control.ColorSchema;
+using static SR_Render_Control.Graph3D;
 
 
 
@@ -72,7 +75,7 @@ namespace APIX_Winform_Demo
             return true;
         }
 
-        private async void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
+        private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
             log.Info("Acquisition completed, trigger the sensor again and display");
             //Sensor1.WriteIO(DigitalOutput.Channel2);
@@ -225,11 +228,7 @@ namespace APIX_Winform_Demo
                 gbx_binning.Visible = true;
             }
 
-            comboBox_ImageType.SelectedIndex = 1;   
-
-
-            //Sensor1.ExposuresAndGains.Add(new ExposureGain(30d, 2));
-
+            comboBox_ImageType.SelectedIndex = 1;
         }
 
         private void btn_SaveConfigrationFile_Click(object sender, EventArgs e)
@@ -245,7 +244,6 @@ namespace APIX_Winform_Demo
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 Sensor1.SaveSensorParameters(saveFileDialog.FileName);
-                //+"\\" + Sensor1.SensorModel.Substring(0, 12) + "_" + DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.json"
             }
             Sensor1.SaveSensorParameters(Sensor1.SensorModel.Substring(0, 12) + "_" + DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.json");
         }
@@ -382,5 +380,6 @@ namespace APIX_Winform_Demo
             }
 
         }
+
     }
 }

@@ -53,6 +53,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\SmartRaySDK 6.0.1.19\bin\x64\SmartRay_api_csharp-x64.dll</HintPath>
     </Reference>
+    <Reference Include="SR_Render_Control">
+      <HintPath>..\..\Download\Graph3D_Render_Control\SR_Render_Control\bin\Release\SR_Render_Control.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />

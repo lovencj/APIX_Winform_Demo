@@ -186,7 +186,7 @@ namespace APIX_Winform_Demo
 
 
 
-            //log.Info("Native ZIL image height:" + profileimage.Height);
+            log.Info("Native ZIL image height:" + profileimage.Height);
 
             //if (ProfileCounter <= this._PacketCounter)
             //if (profileimage.Height<_NumberOfProfileToCapture)
@@ -280,7 +280,7 @@ namespace APIX_Winform_Demo
                 sRImageHandlerArgument.imageheight = (uint)profileimage.Height;
                 sRImageHandlerArgument.imagewidth = (uint)profileimage.Width;
                 //trigger event
-                this.SensorImageEvent(aSensor, sRImageHandlerArgument);
+                this.SensorImageEvent(this, sRImageHandlerArgument);
                 //release memorey objects
                 ProfileCounter = 0;
                 profileimage.Dispose();
@@ -784,7 +784,7 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    _SensorFWVersion = sensor.FirmwareVersion;
+                    _SensorFWVersion = sensor.FirmwareVersion.Replace("\n", "").Replace("\t", "").Replace("\r", "").Replace("\0", "").Trim();
                 }
                 return _SensorFWVersion;
             }
@@ -862,7 +862,7 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    _sensorModel = sensor.ModelName;
+                    _sensorModel = sensor.ModelName.Replace("\n", "").Replace("\t", "").Replace("\r", "").Replace("\0", "").Trim(); ;
                 }
                 return _sensorModel;
             }

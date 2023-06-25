@@ -23,7 +23,7 @@ using System.Drawing;
 //[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
 namespace APIX_Winform_Demo
 {
-    class APIXSensor
+    class APIXSensor : IDisposable
     {
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -137,7 +137,7 @@ namespace APIX_Winform_Demo
                 point3Fs.Clear();
                 ProfileCounter = 0;
                 timer.Stop();
-              //  log.Info("PointCloud taken:" + timer.Duration + "ms");
+                //  log.Info("PointCloud taken:" + timer.Duration + "ms");
 
             }
 
@@ -164,26 +164,22 @@ namespace APIX_Winform_Demo
                 case ImageAcquisitionType.ZMapIntensityLaserLineThickness:
                     Mat _profileMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
                     profileimage.PushBack(_profileMatimage1);
-                    Mat _intensityMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aIntensityImageData, aWidth * sizeof(UInt16));
-                    intensityImage.PushBack(_intensityMatimage);
-                    Mat _llTImage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aLaserLineThicknessImageData, aWidth * sizeof(UInt16));
-                    laserlinethicknessImage.PushBack(_intensityMatimage);
+                    Mat _intensityMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aIntensityImageData, aWidth * sizeof(UInt16));
+                    intensityImage.PushBack(_intensityMatimage1);
+                    Mat _llTImage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aLaserLineThicknessImageData, aWidth * sizeof(UInt16));
+                    laserlinethicknessImage.PushBack(_llTImage1);
                     _profileMatimage1.Dispose();
-                    _intensityMatimage.Dispose();
-                    _llTImage.Dispose();
+                    _intensityMatimage1.Dispose();
+                    _llTImage1.Dispose();
                     //release unused memory 
                     Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
                     Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
-                    Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
+                    Marshal.Release(aLaserLineThicknessImageData); aLaserLineThicknessImageData = IntPtr.Zero;
 
                     break;
                 default:
                     break;
             }
-
-
-
-
 
 
             log.Info("Native ZIL image height:" + profileimage.Height);
@@ -414,6 +410,7 @@ namespace APIX_Winform_Demo
                 if (_isSensorConnected)
                 {
                     _AcquisitionType = sensor.GetImageAcquisitionType();
+                    log.Info("Get Image Acquisition Type:" + _AcquisitionType.ToString());
                     //log.Info("Get Image Acquisition Type:" + _AcquisitionType.ToString());
                 }
                 else
@@ -890,6 +887,28 @@ namespace APIX_Winform_Demo
         }
 
 
+        private bool xEnhancement;
+
+        public bool XEhancement
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    xEnhancement = sensor.GetCalibrationDataXEnhancement();
+                }
+                return xEnhancement;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                    sensor.SetCalibrationDataXEnhancement(value);
+                xEnhancement = value;
+            }
+        }
+
+
+
         #endregion
         #region functions
         public Task<bool> Connect()
@@ -1039,6 +1058,14 @@ namespace APIX_Winform_Demo
 
             //test for pointcloud data management list 
             point3Fs.Clear();
+        }
+
+        public void Dispose()
+        {
+            if (this.sensor != null)
+            {
+                sensor.Dispose(); sensor = null;
+            }
         }
 
 

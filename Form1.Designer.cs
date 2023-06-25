@@ -67,6 +67,7 @@ namespace APIX_Winform_Demo
             this.btn_InitialSensor = new System.Windows.Forms.Button();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
             this.cv_imageBox1 = new Emgu.CV.UI.ImageBox();
+            this.ckb_XEnahancement = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -148,6 +149,7 @@ namespace APIX_Winform_Demo
             // 
             this.gbx_binning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbx_binning.Controls.Add(this.ckb_XEnahancement);
             this.gbx_binning.Controls.Add(this.ckb_EnableVerticalBinning);
             this.gbx_binning.Controls.Add(this.ckb_EnableHorizentalBinning);
             this.gbx_binning.Location = new System.Drawing.Point(4, 431);
@@ -166,6 +168,7 @@ namespace APIX_Winform_Demo
             this.ckb_EnableVerticalBinning.TabIndex = 0;
             this.ckb_EnableVerticalBinning.Text = "Enable Vertical Binning";
             this.ckb_EnableVerticalBinning.UseVisualStyleBackColor = true;
+            this.ckb_EnableVerticalBinning.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
             // 
             // ckb_EnableHorizentalBinning
             // 
@@ -176,6 +179,7 @@ namespace APIX_Winform_Demo
             this.ckb_EnableHorizentalBinning.TabIndex = 0;
             this.ckb_EnableHorizentalBinning.Text = "Enable Horizental Binning";
             this.ckb_EnableHorizentalBinning.UseVisualStyleBackColor = true;
+            this.ckb_EnableHorizentalBinning.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
             // 
             // gbx_SensorInfo
             // 
@@ -474,8 +478,20 @@ namespace APIX_Winform_Demo
             this.cv_imageBox1.Location = new System.Drawing.Point(0, 0);
             this.cv_imageBox1.Name = "cv_imageBox1";
             this.cv_imageBox1.Size = new System.Drawing.Size(989, 729);
+            this.cv_imageBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.cv_imageBox1.TabIndex = 2;
             this.cv_imageBox1.TabStop = false;
+            // 
+            // ckb_XEnahancement
+            // 
+            this.ckb_XEnahancement.AutoSize = true;
+            this.ckb_XEnahancement.Location = new System.Drawing.Point(179, 43);
+            this.ckb_XEnahancement.Name = "ckb_XEnahancement";
+            this.ckb_XEnahancement.Size = new System.Drawing.Size(144, 16);
+            this.ckb_XEnahancement.TabIndex = 0;
+            this.ckb_XEnahancement.Text = "Enable X Enhancement";
+            this.ckb_XEnahancement.UseVisualStyleBackColor = true;
+            this.ckb_XEnahancement.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
             // 
             // Form1
             // 
@@ -485,6 +501,7 @@ namespace APIX_Winform_Demo
             this.Controls.Add(this.splitContainer1);
             this.Name = "Form1";
             this.Text = "APIX-Winform";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -543,6 +560,7 @@ namespace APIX_Winform_Demo
         private System.Windows.Forms.ComboBox comboBox_ImageType;
         private System.Windows.Forms.CheckBox ckb_EnableSaveFiles;
         private Emgu.CV.UI.ImageBox cv_imageBox1;
+        private System.Windows.Forms.CheckBox ckb_XEnahancement;
     }
 }
 

@@ -23,9 +23,9 @@ using SmartRay.Api;
 using System.Net;
 using System.Threading;
 using Emgu.CV.Flann;
-using SR_Render_Control;
-using static SR_Render_Control.ColorSchema;
-using static SR_Render_Control.Graph3D;
+//using SR_Render_Control;
+//using static SR_Render_Control.ColorSchema;
+//using static SR_Render_Control.Graph3D;
 
 
 
@@ -155,7 +155,7 @@ namespace APIX_Winform_Demo
 
                 tbx_SensorTempetature.Invoke((Action)(() =>
                 {
-                    tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";
+                    //tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";
                 }));
             })).Start();
             GC.Collect();
@@ -175,7 +175,7 @@ namespace APIX_Winform_Demo
             HiPerfTimer.Stop();
             log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
             HiPerfTimer.Start();
-            Sensor1.AcquisitionType = ImageAcquisitionType.PointCloud;
+            Sensor1.AcquisitionType = ImageAcquisitionType.ZMap;
             Sensor1.NumberOfProfileToCapture = 5000;
             Sensor1.PackSize = 500;
             Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 800);
@@ -245,7 +245,7 @@ namespace APIX_Winform_Demo
             {
                 Sensor1.SaveSensorParameters(saveFileDialog.FileName);
             }
-            Sensor1.SaveSensorParameters(Sensor1.SensorModel.Substring(0, 12) + "_" + DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.json");
+            //Sensor1.SaveSensorParameters(Sensor1.SensorModel.Substring(0, 12) + "_" + DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.json");
         }
 
         private async void btn_StartAcquisition_Click(object sender, EventArgs e)
@@ -261,7 +261,7 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor acquisition mode:" + Sensor1.acquisitionMode);
                 log.Info("Sensor pitch angle:" + Sensor1.TiltAnglePitch);
                 log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
-                Sensor1.SensorROI = new ROI(0, 1920, 474, 96);
+                Sensor1.SensorROI = new ROI(0, 4096, 440, 384);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 {
@@ -281,6 +281,9 @@ namespace APIX_Winform_Demo
             tbx_NumberOfProfile.Enabled = !isStarted;
             tBx_PacketSize.Enabled = !isStarted;
             tBx_PacketTimeout.Enabled = !isStarted;
+            ckb_EnableHorizentalBinning.Enabled = !isStarted;
+            ckb_EnableVerticalBinning.Enabled = !isStarted;
+            ckb_XEnahancement.Enabled = !isStarted;
 
 
 
@@ -381,5 +384,30 @@ namespace APIX_Winform_Demo
 
         }
 
+        private void ckb_EnableHorizentalBinning_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as CheckBox).Name == "ckb_EnableHorizentalBinning")
+            {
+                Sensor1.HorizentalBinningMode = ckb_EnableHorizentalBinning.Checked ? BinningMode.X2 : BinningMode.Off;
+            }
+            else if ((sender as CheckBox).Name == "ckb_EnableVerticalBinning")
+            {
+                Sensor1.VerticalBinningMode = ckb_EnableVerticalBinning.Checked ? BinningMode.X2 : BinningMode.Off;
+            }
+            else if ((sender as CheckBox).Name == "ckb_XEnahancement")
+            {
+                Sensor1.XEhancement = ckb_EnableVerticalBinning.Checked;
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Sensor1!=null & Sensor1.isSensorConnected)
+            {
+                Sensor1.Dispose();
+                Sensor1 = null;
+                ApiManager.CleanUp();
+            }
+        }
     }
 }

@@ -185,12 +185,12 @@ namespace APIX_Winform_Demo
                 Sensor1.NumberOfProfileToCapture = 5000;
                 Sensor1.PackSize = 500;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
-                Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
-                Sensor1.SensorInternalTriggerFreq = 3000;
+                Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
+                Sensor1.SensorInternalTriggerFreq = 8000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
-                Sensor1.TiltAnglePitch = -19f;
-                Sensor1.TiltAngleYaw = -19f;
+                //Sensor1.TiltAnglePitch = -19f;
+                //Sensor1.TiltAngleYaw = -19f;
                 Sensor1.TransportResolution = 0.0128f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
                 log.Info($"{Sensor1.SensorModel}");
@@ -274,7 +274,7 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor pitch angle:" + Sensor1.TiltAnglePitch);
                 log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
                 log.Info("Sensor X enhancement:"+Sensor1.XEhancement);
-                Sensor1.SensorROI = new ROI(0, 4096, 440, 48);
+                Sensor1.SensorROI = new ROI(0, 4096, 640, 48);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel!=null) 
                 {

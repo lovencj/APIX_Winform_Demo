@@ -1057,12 +1057,13 @@ namespace APIX_Winform_Demo
                 {
                     timer.Start();
                     IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse(_IPAddress), _portNumber);
-                    TimeSpan timeSpan = new TimeSpan(15000);
+                    TimeSpan timeSpan = new TimeSpan(0,0,0,0,500);
                     sensor.Connect(ipSensorEndPoint, timeSpan);
                     timer.Stop();
                     log.Info("Connect sensor taken:" + timer.Duration + "ms");
                     timer.Start();
                     sensor.LoadCalibrationDataFromSensor();
+                    timer.Stop() ;
                     //sensor.SetHorizontalBinning(BinningMode.Off);
                     log.Info("Load Calibration file taken:" + timer.Duration + "ms\nSensor connected!");
                     //sensor.Granularity

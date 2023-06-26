@@ -38,6 +38,10 @@ namespace APIX_Winform_Demo
         //test for pointcloud data management list 
         private List<Point3F[]> point3Fs = new List<Point3F[]>();
 
+        //meta data managment
+        private List<MetaDataCollection> metaDataCollectionList = new List<MetaDataCollection>();
+
+
 
         /// <summary>
         /// 2. define event delegate
@@ -62,9 +66,9 @@ namespace APIX_Winform_Demo
             sensor.OnLiveImage += new Sensor.OnLiveImageDelegate(OnLiveImageEvent);
 
             sensor.OnPilImage += Sensor_OnPilImage;
-            sensor.OnPilImageNative += Sensor_OnPilImageNative;
-            //sensor.OnZilImage += Sensor_OnZilImage;
-            sensor.OnZilImageNative += Sensor_OnZilImageNative;
+            //sensor.OnPilImageNative += Sensor_OnPilImageNative;//Native callback almost the same with non-Native, Just the memory handle
+            sensor.OnZilImage += Sensor_OnZilImage;
+            //sensor.OnZilImageNative += Sensor_OnZilImageNative;
             sensor.OnPointCloudImage += Sensor_OnPointCloudImage;
             sensor.OnIOChanged += new Sensor.OnIOChangedDelegate(OnSensorIOStatusChangedEvent);
 
@@ -80,10 +84,6 @@ namespace APIX_Winform_Demo
             this._PackSize = 500;
             this._PacketTimeout = new TimeSpan(0, 0, 0, 0, 500);
             this._exposuresAndgains = new List<ExposureGain>();
-
-
-
-
         }
         #region callback functions
 
@@ -141,8 +141,6 @@ namespace APIX_Winform_Demo
 
             }
 
-            //System.Buffer.BlockCopy()
-            // throw new NotImplementedException();
         }
 
         private void Sensor_OnZilImageNative(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, IntPtr aZMapImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, float aOriginYMillimeters)
@@ -152,16 +150,16 @@ namespace APIX_Winform_Demo
             //log.Info("ZIL native callback");
 
 
-            switch (_AcquisitionType)
+            switch (aImageDataType)
             {
-                case ImageAcquisitionType.ZMap:
+                case ImageDataType.ZMap:
                     Mat _profileMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
                     profileimage.PushBack(_profileMatimage);
                     _profileMatimage.Dispose();
                     Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
 
                     break;
-                case ImageAcquisitionType.ZMapIntensityLaserLineThickness:
+                case ImageDataType.ZMapIntensityLaserLineThickness:
                     Mat _profileMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
                     profileimage.PushBack(_profileMatimage1);
                     Mat _intensityMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aIntensityImageData, aWidth * sizeof(UInt16));
@@ -184,17 +182,7 @@ namespace APIX_Winform_Demo
 
             log.Info("Native ZIL image height:" + profileimage.Height);
 
-            //if (ProfileCounter <= this._PacketCounter)
-            //if (profileimage.Height<_NumberOfProfileToCapture)
-            //{
-            //    profileimage.PushBack(_profileMatimage);
-            //    //release unused memory 
-            //    Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
-            //    Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
-            //    Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
-            //    log.Info("Native ZIL image height:"+profileimage.Height);
 
-            //}
             if (profileimage.Height == _NumberOfProfileToCapture)
             {
                 SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
@@ -217,50 +205,110 @@ namespace APIX_Winform_Demo
                 laserlinethicknessImage = new Mat();
 
             }
-
-
         }
 
         private void Sensor_OnZilImage(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, ushort[] aZMapImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, float aOriginYMillimeters)
         {
-            log.Info("ZIL  callback");
+            ProfileCounter++;
+
+            switch (aImageDataType)
+            {
+                case ImageDataType.ZMap:
+                    unsafe
+                    {
+                        IntPtr dataPointer_Zmap= Marshal.UnsafeAddrOfPinnedArrayElement(aZMapImageData, 0);
+                        Mat _ZmapMatimage = new Mat((int)aHeight, (int)(aWidth), Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_Zmap, (int)(aWidth) * sizeof(ushort));
+                        profileimage.PushBack(_ZmapMatimage);
+                        _ZmapMatimage.Dispose();
+                    }
+
+                    break;
+                case ImageDataType.ZMapIntensityLaserLineThickness:
+                    unsafe
+                    {
+                        IntPtr dataPointer_Zmap = Marshal.UnsafeAddrOfPinnedArrayElement(aZMapImageData, 0);
+                        Mat _ZmapMatimage = new Mat((int)aHeight, (int)(aWidth), Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_Zmap, (int)(aWidth) * sizeof(ushort));
+                        profileimage.PushBack(_ZmapMatimage);
+                        _ZmapMatimage.Dispose();
+                        IntPtr dataPointer_Intensity = Marshal.UnsafeAddrOfPinnedArrayElement(aIntensityImageData, 0);
+                        Mat _IntensityMatimage = new Mat((int)aHeight, (int)(aWidth), Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_Intensity, (int)(aWidth) * sizeof(ushort));
+                        intensityImage.PushBack(_IntensityMatimage);
+                        _IntensityMatimage.Dispose();
+                        IntPtr dataPointer_llt = Marshal.UnsafeAddrOfPinnedArrayElement(aLaserLineThicknessImageData, 0);
+                        Mat _LLtMatimage = new Mat((int)aHeight, (int)(aWidth), Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_llt, (int)(aWidth) * sizeof(ushort));
+                        laserlinethicknessImage.PushBack(_LLtMatimage);
+                        _LLtMatimage.Dispose();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if (profileimage.Height == _NumberOfProfileToCapture)
+            {
+                SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
+                sRImageHandlerArgument.profile_image = profileimage.Clone();
+                sRImageHandlerArgument.intensity_image = intensityImage.Clone();
+                sRImageHandlerArgument.laserlinethickness_image = laserlinethicknessImage.Clone();
+                sRImageHandlerArgument.imagetype = aImageDataType;
+
+                sRImageHandlerArgument.imageheight = (uint)profileimage.Height;
+                sRImageHandlerArgument.imagewidth = (uint)profileimage.Width;
+                //trigger event
+                this.SensorImageEvent(this, sRImageHandlerArgument);
+                //release memorey objects
+                ProfileCounter = 0;
+                profileimage.Dispose();
+                profileimage = new Mat();
+                intensityImage.Dispose();
+                intensityImage = new Mat();
+                laserlinethicknessImage.Dispose();
+                laserlinethicknessImage = new Mat();
+            }
+
+            //log.Info("ZIL  callback");
 
         }
 
         private void Sensor_OnPilImageNative(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, IntPtr aProfileImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
         {
-            // throw new NotImplementedException();
             ProfileCounter++;
 
             //log.Info("ZIL native callback");
 
 
-            switch (_AcquisitionType)
+            switch (aImageDataType)
             {
-                case ImageAcquisitionType.Profile:
+                case ImageDataType.Profile:
                     Mat _profileMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aProfileImageData, aWidth * sizeof(UInt16));
                     profileimage.PushBack(_profileMatimage);
                     _profileMatimage.Dispose();
                     Marshal.Release(aProfileImageData); aProfileImageData = IntPtr.Zero;
 
                     break;
-                case ImageAcquisitionType.ProfileIntensityLaserLineThickness:
+                case ImageDataType.ProfileIntensityLaserLineThickness:
                     Mat _profileMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aProfileImageData, aWidth * sizeof(UInt16));
                     profileimage.PushBack(_profileMatimage1);
                     Mat _intensityMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aIntensityImageData, aWidth * sizeof(UInt16));
                     intensityImage.PushBack(_intensityMatimage);
                     Mat _llTImage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aLaserLineThicknessImageData, aWidth * sizeof(UInt16));
-                    laserlinethicknessImage.PushBack(_intensityMatimage);
+                    laserlinethicknessImage.PushBack(_llTImage);
                     _profileMatimage1.Dispose();
                     _intensityMatimage.Dispose();
                     _llTImage.Dispose();
                     //release unused memory 
                     Marshal.Release(aProfileImageData); aProfileImageData = IntPtr.Zero;
                     Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
-                    Marshal.Release(aLaserLineThicknessImageData); aIntensityImageData = IntPtr.Zero;
+                    Marshal.Release(aLaserLineThicknessImageData); aLaserLineThicknessImageData = IntPtr.Zero;
                     break;
                 default:
                     break;
+            }
+
+            //Handle meta data
+            if (mMetaDataLevel != MetaDataLevel.Off)
+            {
+                metaDataCollectionList.Add(aMetaDataCollection);
             }
 
             log.Info("Native Profile image height:" + profileimage.Height);
@@ -275,6 +323,10 @@ namespace APIX_Winform_Demo
 
                 sRImageHandlerArgument.imageheight = (uint)profileimage.Height;
                 sRImageHandlerArgument.imagewidth = (uint)profileimage.Width;
+                //Set the meta data values
+
+                sRImageHandlerArgument.MetaDataList = metaDataCollectionList;
+
                 //trigger event
                 this.SensorImageEvent(this, sRImageHandlerArgument);
                 //release memorey objects
@@ -285,15 +337,81 @@ namespace APIX_Winform_Demo
                 intensityImage = new Mat();
                 laserlinethicknessImage.Dispose();
                 laserlinethicknessImage = new Mat();
+                metaDataCollectionList.Clear();
+
 
             }
         }
 
-        private void Sensor_OnPilImage(Sensor aSensor, SmartRay.Api.ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, ushort[] aProfileImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
+        private void Sensor_OnPilImage(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, ushort[] aProfileImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
         {
-            // throw new NotImplementedException();
-            log.Info("PIL callback");
+            //log.Info("PIL callback");
+            switch (aImageDataType)
+            {
+                case ImageDataType.Profile:
+                    unsafe
+                    {
+                        IntPtr dataPointer_Profile = Marshal.UnsafeAddrOfPinnedArrayElement(aProfileImageData, 0);
+                        Mat _profileMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_Profile, aWidth * sizeof(UInt16));
+                        profileimage.PushBack(_profileMatimage);
+                        _profileMatimage.Dispose();
+                    }
 
+                    break;
+                case ImageDataType.ProfileIntensityLaserLineThickness:
+                    unsafe
+                    {
+                        IntPtr dataPointer_Profile = Marshal.UnsafeAddrOfPinnedArrayElement(aProfileImageData, 0);
+                        IntPtr dataPointer_Intensity = Marshal.UnsafeAddrOfPinnedArrayElement(aIntensityImageData, 0);
+                        IntPtr dataPointer_llt = Marshal.UnsafeAddrOfPinnedArrayElement(aLaserLineThicknessImageData, 0);
+
+                        Mat _profileMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_Profile, aWidth * sizeof(UInt16));
+                        profileimage.PushBack(_profileMatimage1);
+                        Mat _intensityMatimage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_Intensity, aWidth * sizeof(UInt16));
+                        intensityImage.PushBack(_intensityMatimage);
+                        Mat _llTImage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_llt, aWidth * sizeof(UInt16));
+                        laserlinethicknessImage.PushBack(_llTImage);
+                        _profileMatimage1.Dispose();
+                        _intensityMatimage.Dispose();
+                        _llTImage.Dispose();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            //Handle meta data
+            if (mMetaDataLevel != MetaDataLevel.Off)
+            {
+                metaDataCollectionList.Add(aMetaDataCollection);
+            }
+
+            //log.Info("Profile image height:" + profileimage.Height);
+
+            if (profileimage.Height == _NumberOfProfileToCapture)
+            {
+                SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
+                sRImageHandlerArgument.profile_image = profileimage.Clone();
+                sRImageHandlerArgument.intensity_image = intensityImage.Clone();
+                sRImageHandlerArgument.laserlinethickness_image = laserlinethicknessImage.Clone();
+                sRImageHandlerArgument.imagetype = aImageDataType;
+
+                sRImageHandlerArgument.imageheight = (uint)profileimage.Height;
+                sRImageHandlerArgument.imagewidth = (uint)profileimage.Width;
+                //Set the meta data values
+                sRImageHandlerArgument.MetaDataList = metaDataCollectionList;
+                //trigger event
+                this.SensorImageEvent(this, sRImageHandlerArgument);
+                //release memorey objects
+                ProfileCounter = 0;
+                profileimage.Dispose();
+                profileimage = new Mat();
+                intensityImage.Dispose();
+                intensityImage = new Mat();
+                laserlinethicknessImage.Dispose();
+                laserlinethicknessImage = new Mat();
+                metaDataCollectionList.Clear();
+            }
         }
 
 
@@ -303,6 +421,7 @@ namespace APIX_Winform_Demo
             Mat _liveImage = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1, aImageDataPtr, aWidth * sizeof(byte));
 
             SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
+            sRImageHandlerArgument.imagetype = ImageDataType.LiveImage;
             sRImageHandlerArgument.imageheight = (uint)aHeight;
             sRImageHandlerArgument.imagewidth = (uint)aWidth;
             sRImageHandlerArgument.liveimage = _liveImage.Clone();
@@ -906,6 +1025,24 @@ namespace APIX_Winform_Demo
                 xEnhancement = value;
             }
         }
+        private MetaDataLevel mMetaDataLevel;
+
+        public MetaDataLevel MetaDataLevel
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    mMetaDataLevel = sensor.GetMetaDataLevel();
+                }
+                return mMetaDataLevel;
+            }
+            set
+            {
+                if (_isSensorConnected) sensor.SetMetaDataLevel(value);
+                mMetaDataLevel = value;
+            }
+        }
 
 
 
@@ -1055,9 +1192,10 @@ namespace APIX_Winform_Demo
             profileimage.Dispose(); profileimage = new Mat();
             intensityImage.Dispose(); intensityImage = new Mat();
             laserlinethicknessImage.Dispose(); laserlinethicknessImage = new Mat();
-
+            
             //test for pointcloud data management list 
             point3Fs.Clear();
+            metaDataCollectionList.Clear();
         }
 
         public void Dispose()
@@ -1106,6 +1244,7 @@ namespace APIX_Winform_Demo
         public uint imageheight;
         public uint imagewidth;
         public ImageDataType imagetype;
+        public List<MetaDataCollection> MetaDataList;
         public SRImageHandlerArgument()
         {
             liveimage = null;
@@ -1116,6 +1255,7 @@ namespace APIX_Winform_Demo
             imageheight = 0;
             imagewidth = 0;
             imagetype = ImageDataType.Invalid;
+            MetaDataList = null;
         }
 
     }

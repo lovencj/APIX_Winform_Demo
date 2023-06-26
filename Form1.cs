@@ -54,6 +54,8 @@ namespace APIX_Winform_Demo
             gbx_SaveImage.Visible = false;
             gbx_StartAcquisition.Visible = false;
 
+            btn_StartAcquisition.Enabled= false;
+            btn_SimulateTrigger.Enabled= false;
 
             log.Info("The UI initialed!");
             HiPerfTimer.Start();
@@ -173,65 +175,72 @@ namespace APIX_Winform_Demo
         {
             HiPerfTimer.Start();
             var result = await Sensor1.Connect();
-            log.Info(Sensor1.SensorFWVersion);
-            HiPerfTimer.Stop();
-            log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
-            HiPerfTimer.Start();
-            Sensor1.AcquisitionType = ImageAcquisitionType.ZMap;
-            Sensor1.NumberOfProfileToCapture = 5000;
-            Sensor1.PackSize = 500;
-            Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
-            Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
-            Sensor1.SensorInternalTriggerFreq = 3000;
-            Sensor1.StartTriggerEnable = Enabled;
-            Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
-            Sensor1.TiltAnglePitch = -19f;
-            Sensor1.TiltAngleYaw = -19f;
-            Sensor1.TransportResolution = 0.0128f;
-            Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-            log.Info($"{Sensor1.SensorModel}");
-            //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
-            //{
-            //    Sensor1.HorizentalBinningMode = BinningMode.X2;
-            //    Sensor1.VerticalBinningMode = BinningMode.X2;
-
-            //}
-            List<ExposureGain> exposureGains = new List<ExposureGain>();
-            //exposureGains.Add(new ExposureGain(4d, 3));
-            exposureGains.Add(new ExposureGain(60d, 3));
-            Sensor1.ExposuresAndGains = exposureGains;
-
-            //Sensor1.ConfigFilePath=tbx_ConfigFilePath.Text="";
-
-            HiPerfTimer.Stop();
-            log.Info("set sensor parameters taken:" + HiPerfTimer.Duration + "ms");
-
-            //disable the button
-            btn_InitialSensor.Enabled = false;
-            tbx_NumberOfProfile.Enabled = true;
-            tBx_PacketSize.Enabled = true;
-            tBx_PacketTimeout.Enabled = true;
-
-            //display the parameters
-            tbx_NumberOfProfile.Text = Sensor1.NumberOfProfileToCapture.ToString();
-            tBx_PacketSize.Text = Sensor1.PackSize.ToString();
-            tBx_PacketTimeout.Text = Sensor1.PacketTimeout.ToString();
-
-            gbx_SaveImage.Visible = true;
-            gbx_SensorInfo.Visible = true;
-            gbx_SensorPar.Visible = true;
-            gbx_StartAcquisition.Visible = true;
-
-            tbx_APIXVersion.Text = ApiManager.Version;
-            tbx_SensorModel.Text = Sensor1.SensorModel;
-            tbx_FirmwareVersion.Text = Sensor1.SensorFWVersion;
-
-            if (Sensor1.SensorModel.Contains("ECCO X"))
+            if (result)
             {
-                gbx_binning.Visible = true;
-            }
+                log.Info(Sensor1.SensorFWVersion);
+                HiPerfTimer.Stop();
+                log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
+                HiPerfTimer.Start();
+                Sensor1.AcquisitionType = ImageAcquisitionType.ZMap;
+                Sensor1.NumberOfProfileToCapture = 5000;
+                Sensor1.PackSize = 500;
+                Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
+                Sensor1.SensorDataTriggerMode = DataTriggerMode.FreeRunning;
+                Sensor1.SensorInternalTriggerFreq = 3000;
+                Sensor1.StartTriggerEnable = Enabled;
+                Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
+                Sensor1.TiltAnglePitch = -19f;
+                Sensor1.TiltAngleYaw = -19f;
+                Sensor1.TransportResolution = 0.0128f;
+                Sensor1.MetaDataLevel = MetaDataLevel.Version2;
+                log.Info($"{Sensor1.SensorModel}");
+                //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
+                //{
+                //    Sensor1.HorizentalBinningMode = BinningMode.X2;
+                //    Sensor1.VerticalBinningMode = BinningMode.X2;
 
-            comboBox_ImageType.SelectedIndex = 2;
+                //}
+                List<ExposureGain> exposureGains = new List<ExposureGain>();
+                //exposureGains.Add(new ExposureGain(4d, 3));
+                exposureGains.Add(new ExposureGain(60d, 3));
+                Sensor1.ExposuresAndGains = exposureGains;
+
+                //Sensor1.ConfigFilePath=tbx_ConfigFilePath.Text="";
+
+                HiPerfTimer.Stop();
+                log.Info("set sensor parameters taken:" + HiPerfTimer.Duration + "ms");
+
+                //disable the button
+                btn_InitialSensor.Enabled = false;
+                tbx_NumberOfProfile.Enabled = true;
+                tBx_PacketSize.Enabled = true;
+                tBx_PacketTimeout.Enabled = true;
+
+                //display the parameters
+                tbx_NumberOfProfile.Text = Sensor1.NumberOfProfileToCapture.ToString();
+                tBx_PacketSize.Text = Sensor1.PackSize.ToString();
+                tBx_PacketTimeout.Text = Sensor1.PacketTimeout.ToString();
+
+                gbx_SaveImage.Visible = true;
+                gbx_SensorInfo.Visible = true;
+                gbx_SensorPar.Visible = true;
+                gbx_StartAcquisition.Visible = true;
+
+                btn_StartAcquisition.Enabled = true;
+                btn_SimulateTrigger.Enabled = true;
+
+
+                tbx_APIXVersion.Text = ApiManager.Version;
+                tbx_SensorModel.Text = Sensor1.SensorModel;
+                tbx_FirmwareVersion.Text = Sensor1.SensorFWVersion;
+
+                if (Sensor1.SensorModel != null)
+                {
+                    gbx_binning.Visible = Sensor1.SensorModel.Contains("ECCO X");
+                }
+
+                comboBox_ImageType.SelectedIndex = 2;
+            }
         }
 
         private void btn_SaveConfigrationFile_Click(object sender, EventArgs e)
@@ -267,10 +276,13 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor X enhancement:"+Sensor1.XEhancement);
                 Sensor1.SensorROI = new ROI(0, 4096, 440, 48);
                 var s = await Sensor1.StartAcquisition();
-                if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
+                if (Sensor1.SensorModel!=null) 
                 {
-                    log.Info("HorizentalBinning:" + Sensor1.HorizentalBinningMode);
-                    log.Info("VerticalBinning:"+Sensor1.VerticalBinningMode);
+                    if (Sensor1.SensorModel.Contains("ECCO X"))//binning mode just support the ECCO X series sensors
+                    {
+                        log.Info("HorizentalBinning:" + Sensor1.HorizentalBinningMode);
+                        log.Info("VerticalBinning:" + Sensor1.VerticalBinningMode);
+                    }
                 }
                 // var s1 = await Sensor1.WriteIO(DigitalOutput.Channel2);
 

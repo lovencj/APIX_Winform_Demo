@@ -216,7 +216,7 @@ namespace APIX_Winform_Demo
                 case ImageDataType.ZMap:
                     unsafe
                     {
-                        IntPtr dataPointer_Zmap= Marshal.UnsafeAddrOfPinnedArrayElement(aZMapImageData, 0);
+                        IntPtr dataPointer_Zmap = Marshal.UnsafeAddrOfPinnedArrayElement(aZMapImageData, 0);
                         Mat _ZmapMatimage = new Mat((int)aHeight, (int)(aWidth), Emgu.CV.CvEnum.DepthType.Cv16U, 1, dataPointer_Zmap, (int)(aWidth) * sizeof(ushort));
                         profileimage.PushBack(_ZmapMatimage);
                         _ZmapMatimage.Dispose();
@@ -454,8 +454,6 @@ namespace APIX_Winform_Demo
         }
 
 
-        #endregion
-
 
         private void OnDisconnectedEvent(Sensor aSensor)
         {
@@ -467,6 +465,9 @@ namespace APIX_Winform_Demo
         {
             this._isSensorConnected = true;
         }
+
+        #endregion
+
 
         #region sensor parameters propetys
         private string _IPAddress;
@@ -1192,7 +1193,7 @@ namespace APIX_Winform_Demo
             profileimage.Dispose(); profileimage = new Mat();
             intensityImage.Dispose(); intensityImage = new Mat();
             laserlinethicknessImage.Dispose(); laserlinethicknessImage = new Mat();
-            
+
             //test for pointcloud data management list 
             point3Fs.Clear();
             metaDataCollectionList.Clear();

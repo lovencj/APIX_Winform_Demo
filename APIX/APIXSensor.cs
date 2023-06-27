@@ -84,6 +84,8 @@ namespace APIX_Winform_Demo
             this._PackSize = 500;
             this._PacketTimeout = new TimeSpan(0, 0, 0, 0, 500);
             this._exposuresAndgains = new List<ExposureGain>();
+            this._dataTriggerSource = DataTriggerSource.QuadEncoder;
+            this._ExternalTriggerParameter= new ExternalTriggerParameter();
         }
         #region callback functions
 
@@ -467,8 +469,6 @@ namespace APIX_Winform_Demo
         }
 
         #endregion
-
-
         #region sensor parameters propetys
         private string _IPAddress;
 
@@ -748,6 +748,51 @@ namespace APIX_Winform_Demo
             }
         }
 
+        private ExternalTriggerParameter _ExternalTriggerParameter;
+
+        public ExternalTriggerParameter externalTriggerParameter
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.GetDataTriggerExternalTriggerParameters(out _ExternalTriggerParameter.TriggerDivider, out _ExternalTriggerParameter.TriggerDelay, out _ExternalTriggerParameter.TriggerEdgeMode);
+                }
+                return _ExternalTriggerParameter;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetDataTriggerExternalTriggerParameters(value.TriggerDivider, value.TriggerDelay, value.TriggerEdgeMode);
+                }
+                _ExternalTriggerParameter = value;
+            }
+        }
+
+        private DataTriggerSource _dataTriggerSource;
+
+        public DataTriggerSource dataTriggerSource
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _dataTriggerSource = sensor.GetDataTriggerExternalTriggerSource();
+                }
+                return _dataTriggerSource;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                    sensor.SetDataTriggerExternalTriggerSource(value);
+                _dataTriggerSource = value;
+            }
+        }
+
+
+
+
         private bool _StartTriggerEnable;
 
         public bool StartTriggerEnable
@@ -769,6 +814,9 @@ namespace APIX_Winform_Demo
                 _StartTriggerEnable = value;
             }
         }
+
+
+
 
 
         private List<ExposureGain> _exposuresAndgains;
@@ -1057,13 +1105,13 @@ namespace APIX_Winform_Demo
                 {
                     timer.Start();
                     IPEndPoint ipSensorEndPoint = new IPEndPoint(IPAddress.Parse(_IPAddress), _portNumber);
-                    TimeSpan timeSpan = new TimeSpan(0,0,0,0,500);
+                    TimeSpan timeSpan = new TimeSpan(0, 0, 0, 0, 500);
                     sensor.Connect(ipSensorEndPoint, timeSpan);
                     timer.Stop();
                     log.Info("Connect sensor taken:" + timer.Duration + "ms");
                     timer.Start();
                     sensor.LoadCalibrationDataFromSensor();
-                    timer.Stop() ;
+                    timer.Stop();
                     //sensor.SetHorizontalBinning(BinningMode.Off);
                     log.Info("Load Calibration file taken:" + timer.Duration + "ms\nSensor connected!");
                     //sensor.Granularity
@@ -1229,6 +1277,20 @@ namespace APIX_Winform_Demo
             StartY = _StartY;
             Width = _width;
             Height = _Height;
+        }
+    }
+
+
+    public struct ExternalTriggerParameter
+    {
+        public int TriggerDivider;
+        public int TriggerDelay;
+        public TriggerEdgeMode TriggerEdgeMode;
+        public ExternalTriggerParameter(int _mTriggerDivider = 1, int _mTriggerDelay = 0, TriggerEdgeMode _mTriggerEdgeMode = TriggerEdgeMode.RisingEdge)
+        {
+            TriggerDivider = _mTriggerDivider;
+            TriggerDelay = _mTriggerDelay;
+            TriggerEdgeMode = _mTriggerEdgeMode;
         }
     }
 

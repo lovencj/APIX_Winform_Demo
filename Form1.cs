@@ -161,7 +161,7 @@ namespace APIX_Winform_Demo
                 }));
             })).Start();
             GC.Collect();
-            Sensor1.WriteIO(DigitalOutput.Channel2);
+            //Sensor1.WriteIO(DigitalOutput.Channel2);
 
         }
 
@@ -185,13 +185,15 @@ namespace APIX_Winform_Demo
                 Sensor1.NumberOfProfileToCapture = 5000;
                 Sensor1.PackSize = 500;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
-                Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
+                Sensor1.SensorDataTriggerMode = DataTriggerMode.External;
+                Sensor1.dataTriggerSource = DataTriggerSource.QuadEncoder;
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(6, 0,TriggerEdgeMode.RisingEdge);
                 Sensor1.SensorInternalTriggerFreq = 8000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
                 //Sensor1.TiltAnglePitch = -19f;
                 //Sensor1.TiltAngleYaw = -19f;
-                Sensor1.TransportResolution = 0.0128f;
+                Sensor1.TransportResolution = 0.006f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
                 log.Info($"{Sensor1.SensorModel}");
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
@@ -274,7 +276,10 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor pitch angle:" + Sensor1.TiltAnglePitch);
                 log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
                 log.Info("Sensor X enhancement:"+Sensor1.XEhancement);
-                Sensor1.SensorROI = new ROI(0, 4096, 640, 48);
+                log.Info("Sensor Data Trigger mode:" + Sensor1.SensorDataTriggerMode);
+                log.Info("Sensor Data Trigger source:" + Sensor1.dataTriggerSource);
+                log.Info("Sensor data trigger parameters:" + "Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider + "Trigger delay:" + Sensor1.externalTriggerParameter.TriggerDelay + "Trigger Edge mode:" + Sensor1.externalTriggerParameter.TriggerEdgeMode);
+                Sensor1.SensorROI = new ROI(0, 4096, 636, 48);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel!=null) 
                 {

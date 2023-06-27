@@ -192,15 +192,15 @@ namespace APIX_Winform_Demo
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
                 Sensor1.SensorDataTriggerMode = DataTriggerMode.External;
                 Sensor1.dataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0,TriggerEdgeMode.RisingEdge);
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(6, 0,TriggerEdgeMode.RisingEdge);
                 Sensor1.SensorInternalTriggerFreq = 8000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
                 //Sensor1.TiltAnglePitch = -19f;
                 //Sensor1.TiltAngleYaw = -19f;
-                Sensor1.TransportResolution = 0.012f;
+                Sensor1.TransportResolution = 0.006f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.006f);
                 log.Info($"{Sensor1.SensorModel}");
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 //{

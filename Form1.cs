@@ -192,14 +192,15 @@ namespace APIX_Winform_Demo
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
                 Sensor1.SensorDataTriggerMode = DataTriggerMode.External;
                 Sensor1.dataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(6, 0,TriggerEdgeMode.RisingEdge);
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0,TriggerEdgeMode.RisingEdge);
                 Sensor1.SensorInternalTriggerFreq = 8000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
                 //Sensor1.TiltAnglePitch = -19f;
                 //Sensor1.TiltAngleYaw = -19f;
-                Sensor1.TransportResolution = 0.006f;
+                Sensor1.TransportResolution = 0.012f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
                 log.Info($"{Sensor1.SensorModel}");
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 //{
@@ -207,9 +208,11 @@ namespace APIX_Winform_Demo
                 //    Sensor1.VerticalBinningMode = BinningMode.X2;
 
                 //}
-                List<ExposureGain> exposureGains = new List<ExposureGain>();
-                //exposureGains.Add(new ExposureGain(4d, 3));
-                exposureGains.Add(new ExposureGain(60d, 3));
+                List<ExposureGain> exposureGains = new List<ExposureGain>
+                {
+                    //exposureGains.Add(new ExposureGain(4d, 3));
+                    new ExposureGain(30d, 2)
+                };
                 Sensor1.ExposuresAndGains = exposureGains;
 
                 Sensor1.SensorROI = new ROI(0, 4096, 636, 48);
@@ -289,6 +292,7 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor data trigger parameters:" + "Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider + ", Trigger delay:" + Sensor1.externalTriggerParameter.TriggerDelay + ", Trigger Edge mode:" + Sensor1.externalTriggerParameter.TriggerEdgeMode);
                 log.Info("Sensor Maximun scan rate:" + Sensor1.MaximumScanRate + ", Distance Pre circle:" + Sensor1.DistancePreCircle + ", Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Maximun running speed is: MaximumScanRate x DistancePreCircle x TriggerDivider=" + Sensor1.MaximumScanRate * Sensor1.DistancePreCircle * Sensor1.externalTriggerParameter.TriggerDivider);
+                log.Info("Sensor Zmap Resolution: Vertical Resolution:"+Sensor1.ZmapResolution.VerticalResolution.ToString()+", Laterval Resolution:"+Sensor1.ZmapResolution.LatervalResolution);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel!=null) 
                 {

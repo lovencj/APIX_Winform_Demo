@@ -86,7 +86,7 @@ namespace APIX_Winform_Demo
             this._exposuresAndgains = new List<ExposureGain>();
             this._dataTriggerSource = DataTriggerSource.QuadEncoder;
             this._ExternalTriggerParameter = new ExternalTriggerParameter();
-            this._currentScanRate=new CurrentScanRateStruct();
+            this._currentScanRate = new CurrentScanRateStruct();
             this._distancePreCircle = 0.001d;
         }
         #region callback functions
@@ -1146,6 +1146,26 @@ namespace APIX_Winform_Demo
             }
         }
 
+        private ZmapResolution _ZmapResolution;
+
+        public ZmapResolution ZmapResolution
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.GetZmapResolution(out _ZmapResolution.LatervalResolution, out _ZmapResolution.VerticalResolution);
+                }
+                return _ZmapResolution;
+            }
+            set
+            {
+                if (_isSensorConnected) 
+                    sensor.SetZmapResolution(value.LatervalResolution, value.VerticalResolution);
+                _ZmapResolution = value;
+            }
+        }
+
 
 
         #endregion
@@ -1355,6 +1375,17 @@ namespace APIX_Winform_Demo
         {
             CurrentScanRate = _CurrentScanRate;
             isTriggerOverflow = _isTriggerOverflow;
+        }
+    }
+
+    public struct ZmapResolution
+    {
+        public float VerticalResolution;
+        public float LatervalResolution;
+        public ZmapResolution(float _VerticalResolution = 0.001f, float _LatervalResolution = 0.006f)
+        {
+            VerticalResolution = _VerticalResolution;
+            LatervalResolution = _LatervalResolution;
         }
     }
 

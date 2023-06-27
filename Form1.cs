@@ -278,7 +278,7 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor X enhancement:"+Sensor1.XEhancement);
                 log.Info("Sensor Data Trigger mode:" + Sensor1.SensorDataTriggerMode);
                 log.Info("Sensor Data Trigger source:" + Sensor1.dataTriggerSource);
-                log.Info("Sensor data trigger parameters:" + "Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider + "Trigger delay:" + Sensor1.externalTriggerParameter.TriggerDelay + "Trigger Edge mode:" + Sensor1.externalTriggerParameter.TriggerEdgeMode);
+                log.Info("Sensor data trigger parameters:" + "Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider + ", Trigger delay:" + Sensor1.externalTriggerParameter.TriggerDelay + ", Trigger Edge mode:" + Sensor1.externalTriggerParameter.TriggerEdgeMode);
                 Sensor1.SensorROI = new ROI(0, 4096, 636, 48);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel!=null) 

@@ -85,7 +85,9 @@ namespace APIX_Winform_Demo
             this._PacketTimeout = new TimeSpan(0, 0, 0, 0, 500);
             this._exposuresAndgains = new List<ExposureGain>();
             this._dataTriggerSource = DataTriggerSource.QuadEncoder;
-            this._ExternalTriggerParameter= new ExternalTriggerParameter();
+            this._ExternalTriggerParameter = new ExternalTriggerParameter();
+            this._currentScanRate=new CurrentScanRateStruct();
+            this._distancePreCircle = 0.001d;
         }
         #region callback functions
 
@@ -621,6 +623,57 @@ namespace APIX_Winform_Demo
             }
         }
 
+        private int _maximumScanrate;
+
+        public int MaximumScanRate
+        {
+            get
+            {
+                if (_isSensorConnected)
+                    _maximumScanrate = sensor.GetMaximumScanRate();
+                return _maximumScanrate;
+            }
+
+        }
+        private int _transmissionRate;
+
+        public int TransmissionRate
+        {
+            get
+            {
+                if (_isSensorConnected)
+                    _transmissionRate = sensor.GetTransmissionRate();
+                return _transmissionRate;
+            }
+        }
+
+        private CurrentScanRateStruct _currentScanRate;
+
+        public CurrentScanRateStruct CurrentScanRate
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.GetScanRate(out _currentScanRate.CurrentScanRate, out _currentScanRate.isTriggerOverflow);
+                }
+                return _currentScanRate;
+            }
+        }
+
+        private double _distancePreCircle;
+
+        public double DistancePreCircle
+        {
+            get
+            {
+                return _distancePreCircle;
+            }
+            set
+            {
+                _distancePreCircle = value;
+            }
+        }
 
 
         private TimeSpan _PacketTimeout;
@@ -1294,6 +1347,16 @@ namespace APIX_Winform_Demo
         }
     }
 
+    public struct CurrentScanRateStruct
+    {
+        public int CurrentScanRate;
+        public int isTriggerOverflow;
+        public CurrentScanRateStruct(int _CurrentScanRate = 1000, int _isTriggerOverflow = 0)
+        {
+            CurrentScanRate = _CurrentScanRate;
+            isTriggerOverflow = _isTriggerOverflow;
+        }
+    }
 
     /// <summary>
     /// 1. define event args

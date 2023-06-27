@@ -82,7 +82,7 @@ namespace APIX_Winform_Demo
             log.Info("Acquisition completed, trigger the sensor again and display");
             //Sensor1.WriteIO(DigitalOutput.Channel2);
 
-            //var tempSensor = sensor as APIXSensor;
+            var tempSensor = sensor as APIXSensor;
 
             //Cross thread to display image and save files
             new Task(new Action(() =>
@@ -159,6 +159,11 @@ namespace APIX_Winform_Demo
                 {
                     //tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";//it's not working with ECCO X series sensor
                 }));
+                this.Invoke((Action)(() =>
+                {
+                    this.Text= "Current Scan rate: "+tempSensor.CurrentScanRate.CurrentScanRate.ToString()+",is overflow: "+ tempSensor.CurrentScanRate.isTriggerOverflow.ToString();
+                    //tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";//it's not working with ECCO X series sensor
+                }));
             })).Start();
             GC.Collect();
             //Sensor1.WriteIO(DigitalOutput.Channel2);
@@ -206,6 +211,9 @@ namespace APIX_Winform_Demo
                 //exposureGains.Add(new ExposureGain(4d, 3));
                 exposureGains.Add(new ExposureGain(60d, 3));
                 Sensor1.ExposuresAndGains = exposureGains;
+
+                Sensor1.SensorROI = new ROI(0, 4096, 636, 48);
+
 
                 //Sensor1.ConfigFilePath=tbx_ConfigFilePath.Text="";
 
@@ -279,7 +287,8 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor Data Trigger mode:" + Sensor1.SensorDataTriggerMode);
                 log.Info("Sensor Data Trigger source:" + Sensor1.dataTriggerSource);
                 log.Info("Sensor data trigger parameters:" + "Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider + ", Trigger delay:" + Sensor1.externalTriggerParameter.TriggerDelay + ", Trigger Edge mode:" + Sensor1.externalTriggerParameter.TriggerEdgeMode);
-                Sensor1.SensorROI = new ROI(0, 4096, 636, 48);
+                log.Info("Sensor Maximun scan rate:" + Sensor1.MaximumScanRate + ", Distance Pre circle:" + Sensor1.DistancePreCircle + ", Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider);
+                log.Info("Sensor Maximun running speed is: MaximumScanRate x DistancePreCircle x TriggerDivider=" + Sensor1.MaximumScanRate * Sensor1.DistancePreCircle * Sensor1.externalTriggerParameter.TriggerDivider);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel!=null) 
                 {

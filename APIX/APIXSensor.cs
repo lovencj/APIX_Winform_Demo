@@ -1160,12 +1160,66 @@ namespace APIX_Winform_Demo
             }
             set
             {
-                if (_isSensorConnected) 
+                if (_isSensorConnected)
                     sensor.SetZmapResolution(value.LatervalResolution, value.VerticalResolution);
                 _ZmapResolution = value;
             }
         }
 
+        private string _SmartXTract;
+        public string SmartXTract
+        {
+            get
+            {
+                return _SmartXTract;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetSmartXtractPreset(value);
+                    if (value != string.Empty)
+                    {
+                        sensor.IsSmartXtractEnabled(true);
+                    }
+                    else
+                    {
+                        sensor.IsSmartXtractEnabled(false);
+                    }
+                }
+                _SmartXTract = value;
+            }
+        }
+
+        private string _SmartXPress;
+        public string SmartXPrress
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _SmartXPress = sensor.GetSmartXpressConfiguration();
+                    if (_SmartXPress != string.Empty)
+                    {
+                        sensor.GetSmartXpress();
+                    }
+                }
+                return _SmartXPress;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetSmartXpressConfiguration(value);
+                    if (value != string.Empty)
+                    {
+                        sensor.SetSmartXpress(true);
+                    }
+                    else { sensor.SetSmartXpress(false); }
+                }
+                _SmartXPress = value;
+            }
+        }
 
 
         #endregion

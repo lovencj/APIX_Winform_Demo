@@ -20,14 +20,6 @@ using Emgu.CV;
 //define Smartray APiX
 using SmartRay;
 using SmartRay.Api;
-using System.Net;
-using System.Threading;
-using Emgu.CV.Flann;
-//using SR_Render_Control;
-//using static SR_Render_Control.ColorSchema;
-//using static SR_Render_Control.Graph3D;
-
-
 
 //define log4net
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
@@ -157,6 +149,7 @@ namespace APIX_Winform_Demo
 
                 tbx_SensorTempetature.Invoke((Action)(() =>
                 {
+                    //ECCO X025不支持获取传感器温度
                     //tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";//it's not working with ECCO X series sensor
                 }));
                 this.Invoke((Action)(() =>
@@ -318,8 +311,6 @@ namespace APIX_Winform_Demo
             ckb_EnableHorizentalBinning.Enabled = !isStarted;
             ckb_EnableVerticalBinning.Enabled = !isStarted;
             ckb_XEnahancement.Enabled = !isStarted;
-
-
 
             //set the button color
             btn_StartAcquisition.BackColor = isStarted ? Color.Green : Color.Red;

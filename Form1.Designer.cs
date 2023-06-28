@@ -31,11 +31,16 @@ namespace APIX_Winform_Demo
         {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.cv_imageBox1 = new Emgu.CV.UI.ImageBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.gbx_SaveImage = new System.Windows.Forms.GroupBox();
             this.ckb_EnableSaveFiles = new System.Windows.Forms.CheckBox();
             this.btn_ChooseSaveFilePath = new System.Windows.Forms.Button();
             this.tbx_SaveImageFilePath = new System.Windows.Forms.TextBox();
             this.gbx_binning = new System.Windows.Forms.GroupBox();
+            this.ckb_XEnahancement = new System.Windows.Forms.CheckBox();
             this.ckb_EnableVerticalBinning = new System.Windows.Forms.CheckBox();
             this.ckb_EnableHorizentalBinning = new System.Windows.Forms.CheckBox();
             this.gbx_SensorInfo = new System.Windows.Forms.GroupBox();
@@ -66,19 +71,20 @@ namespace APIX_Winform_Demo
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btn_InitialSensor = new System.Windows.Forms.Button();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
-            this.cv_imageBox1 = new Emgu.CV.UI.ImageBox();
-            this.ckb_XEnahancement = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).BeginInit();
+            this.tabPage2.SuspendLayout();
             this.gbx_SaveImage.SuspendLayout();
             this.gbx_binning.SuspendLayout();
             this.gbx_SensorInfo.SuspendLayout();
             this.gbx_StartAcquisition.SuspendLayout();
             this.gbx_SensorPar.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -89,7 +95,7 @@ namespace APIX_Winform_Demo
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.cv_imageBox1);
+            this.splitContainer1.Panel1.Controls.Add(this.tabControl1);
             // 
             // splitContainer1.Panel2
             // 
@@ -103,6 +109,47 @@ namespace APIX_Winform_Demo
             this.splitContainer1.Size = new System.Drawing.Size(1350, 729);
             this.splitContainer1.SplitterDistance = 989;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(989, 729);
+            this.tabControl1.TabIndex = 0;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.cv_imageBox1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(981, 703);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // cv_imageBox1
+            // 
+            this.cv_imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cv_imageBox1.Location = new System.Drawing.Point(3, 3);
+            this.cv_imageBox1.Name = "cv_imageBox1";
+            this.cv_imageBox1.Size = new System.Drawing.Size(975, 697);
+            this.cv_imageBox1.TabIndex = 2;
+            this.cv_imageBox1.TabStop = false;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(981, 703);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "tabPage2";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // gbx_SaveImage
             // 
@@ -158,6 +205,17 @@ namespace APIX_Winform_Demo
             this.gbx_binning.TabIndex = 6;
             this.gbx_binning.TabStop = false;
             this.gbx_binning.Text = "Binning Mode[ECCO X Series:]:";
+            // 
+            // ckb_XEnahancement
+            // 
+            this.ckb_XEnahancement.AutoSize = true;
+            this.ckb_XEnahancement.Location = new System.Drawing.Point(179, 43);
+            this.ckb_XEnahancement.Name = "ckb_XEnahancement";
+            this.ckb_XEnahancement.Size = new System.Drawing.Size(144, 16);
+            this.ckb_XEnahancement.TabIndex = 0;
+            this.ckb_XEnahancement.Text = "Enable X Enhancement";
+            this.ckb_XEnahancement.UseVisualStyleBackColor = true;
+            this.ckb_XEnahancement.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
             // 
             // ckb_EnableVerticalBinning
             // 
@@ -472,27 +530,6 @@ namespace APIX_Winform_Demo
             this.vScrollBar1.Size = new System.Drawing.Size(20, 729);
             this.vScrollBar1.TabIndex = 0;
             // 
-            // cv_imageBox1
-            // 
-            this.cv_imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cv_imageBox1.Location = new System.Drawing.Point(0, 0);
-            this.cv_imageBox1.Name = "cv_imageBox1";
-            this.cv_imageBox1.Size = new System.Drawing.Size(989, 729);
-            this.cv_imageBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.cv_imageBox1.TabIndex = 2;
-            this.cv_imageBox1.TabStop = false;
-            // 
-            // ckb_XEnahancement
-            // 
-            this.ckb_XEnahancement.AutoSize = true;
-            this.ckb_XEnahancement.Location = new System.Drawing.Point(179, 43);
-            this.ckb_XEnahancement.Name = "ckb_XEnahancement";
-            this.ckb_XEnahancement.Size = new System.Drawing.Size(144, 16);
-            this.ckb_XEnahancement.TabIndex = 0;
-            this.ckb_XEnahancement.Text = "Enable X Enhancement";
-            this.ckb_XEnahancement.UseVisualStyleBackColor = true;
-            this.ckb_XEnahancement.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -506,6 +543,10 @@ namespace APIX_Winform_Demo
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).EndInit();
+            this.tabPage2.ResumeLayout(false);
             this.gbx_SaveImage.ResumeLayout(false);
             this.gbx_SaveImage.PerformLayout();
             this.gbx_binning.ResumeLayout(false);
@@ -516,7 +557,6 @@ namespace APIX_Winform_Demo
             this.gbx_SensorPar.ResumeLayout(false);
             this.gbx_SensorPar.PerformLayout();
             this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -559,8 +599,11 @@ namespace APIX_Winform_Demo
         private System.Windows.Forms.TextBox tbx_APIXVersion;
         private System.Windows.Forms.ComboBox comboBox_ImageType;
         private System.Windows.Forms.CheckBox ckb_EnableSaveFiles;
-        private Emgu.CV.UI.ImageBox cv_imageBox1;
         private System.Windows.Forms.CheckBox ckb_XEnahancement;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private Emgu.CV.UI.ImageBox cv_imageBox1;
+        private System.Windows.Forms.TabPage tabPage2;
     }
 }
 

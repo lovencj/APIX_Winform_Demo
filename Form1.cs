@@ -29,10 +29,10 @@ namespace APIX_Winform_Demo
     {
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private bool isStarted = false;
-        private HiPerfTimer HiPerfTimer = new HiPerfTimer();
+        private readonly HiPerfTimer HiPerfTimer = new HiPerfTimer();
 
         APIXSensor Sensor1 = new APIXSensor();
-        SensorHelper sensorHelper = new SensorHelper();
+        readonly SensorHelper sensorHelper = new SensorHelper();
         public Form1()
         {
             InitializeComponent();
@@ -48,6 +48,7 @@ namespace APIX_Winform_Demo
 
             btn_StartAcquisition.Enabled= false;
             btn_SimulateTrigger.Enabled= false;
+
 
             log.Info("The UI initialed!");
             HiPerfTimer.Start();
@@ -183,15 +184,15 @@ namespace APIX_Winform_Demo
                 Sensor1.NumberOfProfileToCapture = 5000;
                 Sensor1.PackSize = 500;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
-                Sensor1.SensorDataTriggerMode = DataTriggerMode.External;
-                Sensor1.dataTriggerSource = DataTriggerSource.QuadEncoder;
+                Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
+                Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
                 Sensor1.externalTriggerParameter = new ExternalTriggerParameter(6, 0,TriggerEdgeMode.RisingEdge);
-                Sensor1.SensorInternalTriggerFreq = 8000;
+                Sensor1.SensorInternalTriggerFreq = 1000;
                 Sensor1.StartTriggerEnable = Enabled;
-                Sensor1.acquisitionMode = AcquisitionMode.RepeatSnapshot;
+                Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
                 //Sensor1.TiltAnglePitch = -19f;
                 //Sensor1.TiltAngleYaw = -19f;
-                Sensor1.TransportResolution = 0.006f;
+                Sensor1.TransportResolution = 0.019f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
                 Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.006f);
                 log.Info($"{Sensor1.SensorModel}");
@@ -204,11 +205,12 @@ namespace APIX_Winform_Demo
                 List<ExposureGain> exposureGains = new List<ExposureGain>
                 {
                     //exposureGains.Add(new ExposureGain(4d, 3));
+                    new ExposureGain(10d, 2),
                     new ExposureGain(30d, 2)
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 4096, 636, 48);
+                Sensor1.SensorROI = new ROI(0, 1920, 360, 494);
 
 
                 //Sensor1.ConfigFilePath=tbx_ConfigFilePath.Text="";
@@ -271,17 +273,17 @@ namespace APIX_Winform_Demo
             isStarted = !isStarted;
             if (isStarted)
             {
-                Sensor1.clearbuffer();
+                Sensor1.Clearbuffer();
                 log.Info("Number of profile to capture:" + Sensor1.NumberOfProfileToCapture);
                 log.Info("Packsize:" + Sensor1.PackSize);
                 log.Info("Image Type:" + Sensor1.AcquisitionType);
                 log.Info("exposure and gain:" + Sensor1.ExposuresAndGains.Count);
-                log.Info("Sensor acquisition mode:" + Sensor1.acquisitionMode);
+                log.Info("Sensor acquisition mode:" + Sensor1.AcquisitionMode);
                 log.Info("Sensor pitch angle:" + Sensor1.TiltAnglePitch);
                 log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
                 log.Info("Sensor X enhancement:"+Sensor1.XEhancement);
                 log.Info("Sensor Data Trigger mode:" + Sensor1.SensorDataTriggerMode);
-                log.Info("Sensor Data Trigger source:" + Sensor1.dataTriggerSource);
+                log.Info("Sensor Data Trigger source:" + Sensor1.DataTriggerSource);
                 log.Info("Sensor data trigger parameters:" + "Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider + ", Trigger delay:" + Sensor1.externalTriggerParameter.TriggerDelay + ", Trigger Edge mode:" + Sensor1.externalTriggerParameter.TriggerEdgeMode);
                 log.Info("Sensor Maximun scan rate:" + Sensor1.MaximumScanRate + ", Distance Pre circle:" + Sensor1.DistancePreCircle + ", Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Maximun running speed is: MaximumScanRate x DistancePreCircle x TriggerDivider=" + Sensor1.MaximumScanRate * Sensor1.DistancePreCircle * Sensor1.externalTriggerParameter.TriggerDivider);
@@ -302,7 +304,7 @@ namespace APIX_Winform_Demo
             {
                 log.Info("Sensor stop acquisition");
                 var s1 = await Sensor1.StopAcquisition();
-                Sensor1.clearbuffer();
+                Sensor1.Clearbuffer();
             }
 
             tbx_NumberOfProfile.Enabled = !isStarted;
@@ -327,7 +329,7 @@ namespace APIX_Winform_Demo
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            if (Sensor1.isSensorConnected)
+            if (Sensor1.IsSensorConnected)
             {
                 Sensor1.NumberOfProfileToCapture = uint.Parse(tbx_NumberOfProfile.Text);
             }
@@ -335,7 +337,7 @@ namespace APIX_Winform_Demo
 
         private void tBx_PacketSize_TextChanged(object sender, EventArgs e)
         {
-            if (Sensor1.isSensorConnected)
+            if (Sensor1.IsSensorConnected)
             {
                 Sensor1.PackSize = uint.Parse(tBx_PacketSize.Text);
             }
@@ -343,7 +345,7 @@ namespace APIX_Winform_Demo
 
         private void tBx_PacketTimeout_TextChanged(object sender, EventArgs e)
         {
-            if (Sensor1.isSensorConnected)
+            if (Sensor1.IsSensorConnected)
             {
                 Sensor1.PacketTimeout = TimeSpan.Parse(tBx_PacketTimeout.Text);
             }
@@ -355,9 +357,9 @@ namespace APIX_Winform_Demo
             {
                 Title = "Please select the sensor:" + Sensor1.SensorModel + " configuration file:",
                 Filter = "*.json|*.json|*.par|*.par|All files(*.*)|*.*",
-                Multiselect = false
+                Multiselect = false,
+                RestoreDirectory = true
             };
-            openFileDialog.RestoreDirectory = true;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 Sensor1.ConfigFilePath = openFileDialog.FileName;
@@ -427,7 +429,7 @@ namespace APIX_Winform_Demo
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Sensor1!=null & Sensor1.isSensorConnected)
+            if (Sensor1!=null & Sensor1.IsSensorConnected)
             {
                 Sensor1.Dispose();
                 Sensor1 = null;

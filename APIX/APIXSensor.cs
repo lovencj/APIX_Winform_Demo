@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+﻿//define Emgu.CV
+using Emgu.CV;
 //define log4net
 using log4net;
-
-//define Emgu.CV
-using Emgu;
-using Emgu.CV;
-
-
 //define Smartray APiX
 using SmartRay;
 using SmartRay.Api;
+using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading;
-using System.Drawing;
+using System.Threading.Tasks;
 
 
 //[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
@@ -34,12 +27,12 @@ namespace APIX_Winform_Demo
         private Mat profileimage = new Mat();
         private Mat intensityImage = new Mat();
         private Mat laserlinethicknessImage = new Mat();
-        private HiPerfTimer timer = new HiPerfTimer();
+        private readonly HiPerfTimer timer = new HiPerfTimer();
         //test for pointcloud data management list 
-        private List<Point3F[]> point3Fs = new List<Point3F[]>();
+        private readonly List<Point3F[]> point3Fs = new List<Point3F[]>();
 
         //meta data managment
-        private List<MetaDataCollection> metaDataCollectionList = new List<MetaDataCollection>();
+        private readonly List<MetaDataCollection> metaDataCollectionList = new List<MetaDataCollection>();
 
 
 
@@ -123,14 +116,16 @@ namespace APIX_Winform_Demo
             if (intensityImage.Height == _NumberOfProfileToCapture)
             {
 
-                SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument();
-                sRImageHandlerArgument.intensity_image = intensityImage.Clone();
-                sRImageHandlerArgument.laserlinethickness_image = laserlinethicknessImage.Clone();
-                sRImageHandlerArgument.imagetype = aImageDataType;
+                SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument
+                {
+                    intensity_image = intensityImage.Clone(),
+                    laserlinethickness_image = laserlinethicknessImage.Clone(),
+                    imagetype = aImageDataType,
 
-                sRImageHandlerArgument.imageheight = (uint)intensityImage.Height;
-                sRImageHandlerArgument.imagewidth = (uint)intensityImage.Width;
-                sRImageHandlerArgument.pointcloud = point3Fs.ToArray();
+                    imageheight = (uint)intensityImage.Height,
+                    imagewidth = (uint)intensityImage.Width,
+                    pointcloud = point3Fs.ToArray()
+                };
                 //trigger event
                 this.SensorImageEvent(this, sRImageHandlerArgument);
                 //release memorey objects
@@ -474,7 +469,7 @@ namespace APIX_Winform_Demo
         #region sensor parameters propetys
         private string _IPAddress;
 
-        public string mIPAddress
+        public string MIPAddress
         {
             get { return _IPAddress; }
             set { _IPAddress = value; }
@@ -516,7 +511,7 @@ namespace APIX_Winform_Demo
 
         private bool _isSensorConnected;
 
-        public bool isSensorConnected
+        public bool IsSensorConnected
         {
             get { return _isSensorConnected; }
             set { _isSensorConnected = value; }
@@ -825,7 +820,7 @@ namespace APIX_Winform_Demo
 
         private DataTriggerSource _dataTriggerSource;
 
-        public DataTriggerSource dataTriggerSource
+        public DataTriggerSource DataTriggerSource
         {
             get
             {
@@ -928,7 +923,7 @@ namespace APIX_Winform_Demo
 
         private AcquisitionMode _acquistionMode;
 
-        public AcquisitionMode acquisitionMode
+        public AcquisitionMode AcquisitionMode
         {
             get
             {
@@ -1362,7 +1357,7 @@ namespace APIX_Winform_Demo
             return SaveParaTask;
         }
 
-        public void clearbuffer()
+        public void Clearbuffer()
         {
             ProfileCounter = 0;
 

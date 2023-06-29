@@ -180,7 +180,7 @@ namespace APIX_Winform_Demo
                 HiPerfTimer.Stop();
                 log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
                 HiPerfTimer.Start();
-                Sensor1.AcquisitionType = ImageAcquisitionType.ZMap;
+                Sensor1.AcquisitionType = ImageAcquisitionType.ProfileIntensityLaserLineThickness;
                 Sensor1.NumberOfProfileToCapture = 5000;
                 Sensor1.PackSize = 500;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);

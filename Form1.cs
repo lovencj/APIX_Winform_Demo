@@ -151,7 +151,10 @@ namespace APIX_Winform_Demo
                 tbx_SensorTempetature.Invoke((Action)(() =>
                 {
                     //ECCO X025不支持获取传感器温度
-                    //tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";//it's not working with ECCO X series sensor
+                    if (Sensor1.SensorModel.Contains("ECCO 95"))
+                    {
+                        tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";//it's not working with ECCO X series sensor
+                    }
                 }));
                 this.Invoke((Action)(() =>
                 {
@@ -180,21 +183,21 @@ namespace APIX_Winform_Demo
                 HiPerfTimer.Stop();
                 log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
                 HiPerfTimer.Start();
-                Sensor1.AcquisitionType = ImageAcquisitionType.ProfileIntensityLaserLineThickness;
-                Sensor1.NumberOfProfileToCapture = 5000;
-                Sensor1.PackSize = 500;
+                Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
+                Sensor1.NumberOfProfileToCapture = 2000;
+                Sensor1.PackSize = 100;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
                 Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
                 Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(6, 0,TriggerEdgeMode.RisingEdge);
-                Sensor1.SensorInternalTriggerFreq = 1000;
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0,TriggerEdgeMode.RisingEdge);
+                Sensor1.SensorInternalTriggerFreq = 2000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
-                //Sensor1.TiltAnglePitch = -19f;
-                //Sensor1.TiltAngleYaw = -19f;
-                Sensor1.TransportResolution = 0.019f;
+                Sensor1.TiltAnglePitch = -19f;
+                Sensor1.TiltAngleYaw = -19f;
+                Sensor1.TransportResolution = 0.012f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.006f);
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
                 log.Info($"{Sensor1.SensorModel}");
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 //{
@@ -205,12 +208,12 @@ namespace APIX_Winform_Demo
                 List<ExposureGain> exposureGains = new List<ExposureGain>
                 {
                     //exposureGains.Add(new ExposureGain(4d, 3));
-                    new ExposureGain(10d, 2),
-                    new ExposureGain(30d, 2)
+                   // new ExposureGain(10d, 2),
+                    new ExposureGain(10d, 3),new ExposureGain(60d, 3),
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 1920, 360, 494);
+                Sensor1.SensorROI = new ROI(0, 1920, 380, 300);
 
 
                 //Sensor1.ConfigFilePath=tbx_ConfigFilePath.Text="";

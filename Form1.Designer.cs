@@ -78,7 +78,6 @@ namespace APIX_Winform_Demo
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).BeginInit();
-            this.tabPage2.SuspendLayout();
             this.gbx_SaveImage.SuspendLayout();
             this.gbx_binning.SuspendLayout();
             this.gbx_SensorInfo.SuspendLayout();
@@ -90,6 +89,7 @@ namespace APIX_Winform_Demo
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
             // 
@@ -134,7 +134,9 @@ namespace APIX_Winform_Demo
             // 
             // cv_imageBox1
             // 
+            this.cv_imageBox1.BackColor = System.Drawing.Color.DimGray;
             this.cv_imageBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cv_imageBox1.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
             this.cv_imageBox1.Location = new System.Drawing.Point(3, 3);
             this.cv_imageBox1.Name = "cv_imageBox1";
             this.cv_imageBox1.Size = new System.Drawing.Size(975, 697);
@@ -546,7 +548,6 @@ namespace APIX_Winform_Demo
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).EndInit();
-            this.tabPage2.ResumeLayout(false);
             this.gbx_SaveImage.ResumeLayout(false);
             this.gbx_SaveImage.PerformLayout();
             this.gbx_binning.ResumeLayout(false);

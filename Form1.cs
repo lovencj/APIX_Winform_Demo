@@ -31,7 +31,7 @@ namespace APIX_Winform_Demo
         private bool isStarted = false;
         private readonly HiPerfTimer HiPerfTimer = new HiPerfTimer();
 
-        APIXSensor Sensor1 = new APIXSensor();
+        static APIXSensor Sensor1 = new APIXSensor();
         readonly SensorHelper sensorHelper = new SensorHelper();
         public Form1()
         {
@@ -80,12 +80,12 @@ namespace APIX_Winform_Demo
             //Cross thread to display image and save files
             new Task(new Action(() =>
             {
-                cv_imageBox1.Invoke(new Action(() =>
+                cv_imageBox1.Invoke(new Action(async () =>
                 {
                     switch (SRimageHandlerArgument.imagetype)
                     {
                         case ImageDataType.Profile:
-                            cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
+                            cv_imageBox1.Image = await sensorHelper.Gray2ColorImage(SRimageHandlerArgument.profile_image); 
                             if (ckb_EnableSaveFiles.Checked)
                             {
                                 SRimageHandlerArgument.profile_image.Save(tbx_SaveImageFilePath.Text + "\\ProfileImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
@@ -93,7 +93,7 @@ namespace APIX_Winform_Demo
 
                             break;
                         case ImageDataType.ProfileIntensityLaserLineThickness:
-                            cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
+                            cv_imageBox1.Image = await sensorHelper.Gray2ColorImage(SRimageHandlerArgument.profile_image);
                             if (ckb_EnableSaveFiles.Checked)
                             {
                                 SRimageHandlerArgument.profile_image.Save(tbx_SaveImageFilePath.Text + "\\ProfileImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
@@ -132,7 +132,7 @@ namespace APIX_Winform_Demo
 
                             break;
                         case ImageDataType.PointCloud:
-                            cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
+                            cv_imageBox1.Image =await sensorHelper.Gray2ColorImage( SRimageHandlerArgument.intensity_image);
                             if (ckb_EnableSaveFiles.Checked)
                             {
                                 SRimageHandlerArgument.intensity_image.Save(tbx_SaveImageFilePath.Text + "\\ProfileIntensityImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
@@ -153,7 +153,7 @@ namespace APIX_Winform_Demo
                     //ECCO X025不支持获取传感器温度
                     if (Sensor1.SensorModel.Contains("ECCO 95"))
                     {
-                        tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";//it's not working with ECCO X series sensor
+                        tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.000") + "℃";//it's not working with ECCO X series sensor
                     }
                 }));
                 this.Invoke((Action)(() =>
@@ -186,18 +186,18 @@ namespace APIX_Winform_Demo
                 Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
                 Sensor1.NumberOfProfileToCapture = 2000;
                 Sensor1.PackSize = 100;
-                Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
+                Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 10);
                 Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
                 Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0,TriggerEdgeMode.RisingEdge);
-                Sensor1.SensorInternalTriggerFreq = 2000;
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(19, 0,TriggerEdgeMode.RisingEdge);
+                Sensor1.SensorInternalTriggerFreq = 5000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
-                Sensor1.TiltAnglePitch = -19f;
-                Sensor1.TiltAngleYaw = -19f;
-                Sensor1.TransportResolution = 0.012f;
+                Sensor1.TiltAnglePitch = 0f;
+                Sensor1.TiltAngleYaw = 0f;
+                Sensor1.TransportResolution = 0.019f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.019f);
                 log.Info($"{Sensor1.SensorModel}");
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 //{
@@ -213,8 +213,12 @@ namespace APIX_Winform_Demo
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 1920, 380, 300);
+                Sensor1.SensorROI = new ROI(0, 1920, 404, 470);
 
+                //Sensor1.SmartXPress = @"C:\SmartRay\SmartRay DevKit\SR_API\smartxpress\GuageBlock_Test01.sxp";
+                //Sensor1.SmartXAct = SmartXactModeType.Metrology;
+
+                Sensor1.CallBackTimeout = new System.Timers.Timer();
 
                 //Sensor1.ConfigFilePath=tbx_ConfigFilePath.Text="";
 
@@ -291,6 +295,9 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor Maximun scan rate:" + Sensor1.MaximumScanRate + ", Distance Pre circle:" + Sensor1.DistancePreCircle + ", Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Maximun running speed is: MaximumScanRate x DistancePreCircle x TriggerDivider=" + Sensor1.MaximumScanRate * Sensor1.DistancePreCircle * Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Zmap Resolution: Vertical Resolution:"+Sensor1.ZmapResolution.VerticalResolution.ToString()+", Laterval Resolution:"+Sensor1.ZmapResolution.LatervalResolution);
+                log.Info("Sensor SmartXPress parameters:" + Sensor1.SmartXPress);
+                log.Info("Sensor SmartXact mode:" + Sensor1.SmartXAct);
+                log.Info("Sensor Callback timeout:" + Sensor1.CallBackTimeout.Interval);
                 var s = await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel!=null) 
                 {

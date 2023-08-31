@@ -487,11 +487,12 @@ namespace APIX_Winform_Demo
                     {
                         maximumValue = item >= maximumValue ? item : maximumValue;
                         minmumvalue = item != 0 && item <= minmumvalue ? item : minmumvalue;
-                    }
-                    );
+                    });
+
+                    var valueSteps = maximumValue - minmumvalue;
                     Parallel.For(0, data.Length - 1, i =>
                     {
-                        bytedata[i] = data[i] > 0 ? (byte)((data[i] - minmumvalue) * 255 / (maximumValue - minmumvalue)) : (byte)0;
+                        bytedata[i] = data[i] > 0 ? (byte)((data[i] - minmumvalue) * 255 / valueSteps) : (byte)0;
                     });
 
                     IntPtr ImagePointer = new IntPtr();
@@ -504,6 +505,7 @@ namespace APIX_Winform_Demo
                         }
                     }
                     Mat newScaleMat = new Mat(inputImage.Height, inputImage.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 3);
+
                     thresholdimage = new Mat(inputImage.Height, inputImage.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 1, ImagePointer, inputImage.Width);
                     CvInvoke.ApplyColorMap(thresholdimage, newScaleMat, ColorMapType.Rainbow);
 

@@ -1187,7 +1187,7 @@ namespace APIX_Winform_Demo
         }
 
         private string _SmartXPress;
-        public string SmartXPrress
+        public string SmartXPress
         {
             get
             {
@@ -1215,6 +1215,64 @@ namespace APIX_Winform_Demo
                 _SmartXPress = value;
             }
         }
+
+        private SmartXactModeType _SmartXAct;
+
+        public SmartXactModeType SmartXAct
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _SmartXAct = sensor.GetSmartXactMode();
+                }
+                return _SmartXAct;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetSmartXactMode(value);
+
+                }
+                //_SmartXAct = value;
+            }
+        }
+
+
+        private System.Timers.Timer _CallbackTimeout;
+
+        public System.Timers.Timer CallBackTimeout
+        {
+            get
+            {
+                return _CallbackTimeout;
+            }
+            set
+            {
+                if (_isSensorConnected && _PacketTimeout != TimeSpan.Zero)
+                {
+                    int time_interval = (int)((_NumberOfProfileToCapture / _PackSize) * _PacketTimeout.Milliseconds);
+                    _CallbackTimeout = new System.Timers.Timer(time_interval);
+                    _CallbackTimeout.AutoReset = false;
+                    _CallbackTimeout.Enabled = true;
+                    _CallbackTimeout.Elapsed += _CallbackTimeout_Elapsed;
+                }
+                else
+                {
+                    _CallbackTimeout=null;
+                }
+                _CallbackTimeout = value;
+            }
+        }
+
+
+        private void _CallbackTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            //throw new NotImplementedException();
+            log.Warn("Sensor Callback timeout:" +e.ToString());
+        }
+
 
 
         #endregion

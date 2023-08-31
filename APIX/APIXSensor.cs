@@ -88,7 +88,7 @@ namespace APIX_Winform_Demo
         {
             //throw new NotImplementedException();
             //log.Info(aSensor.ToString() + "," + aInputFlags + "," + aOutputFlags);
-            //log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
+            log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
         }
 
         private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)

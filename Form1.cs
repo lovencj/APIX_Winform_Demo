@@ -77,7 +77,7 @@ namespace APIX_Winform_Demo
 
 
 
-            //Sensor1.SensorImageEvent += Sensor1_SensorImageEvent;
+            Sensor1.SensorImageEvent += Sensor1_SensorImageEvent;
             Sensor2.SensorImageEvent += Sensor1_SensorImageEvent;
 
             return true;
@@ -102,15 +102,15 @@ namespace APIX_Winform_Demo
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 10);
                 Sensor1.SensorDataTriggerMode = DataTriggerMode.External;
                 Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(19, 0, TriggerEdgeMode.RisingEdge);
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0, TriggerEdgeMode.RisingEdge);
                 Sensor1.SensorInternalTriggerFreq = 5000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
                 Sensor1.TiltAnglePitch = 0f;
                 Sensor1.TiltAngleYaw = 0f;
-                Sensor1.TransportResolution = 0.019f;
+                Sensor1.TransportResolution = 0.012f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.019f);
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
                 log.Info($"{Sensor1.SensorModel}");
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 //{
@@ -126,7 +126,7 @@ namespace APIX_Winform_Demo
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 1920, 404, 470);
+                Sensor1.SensorROI = new ROI(0, 1920, 450, 80);
 
                 //Sensor1.SmartXPress = @"C:\SmartRay\SmartRay DevKit\SR_API\smartxpress\GuageBlock_Test01.sxp";
                 //Sensor1.SmartXAct = SmartXactModeType.Metrology;
@@ -158,22 +158,22 @@ namespace APIX_Winform_Demo
                 Sensor2.PacketTimeout = new TimeSpan(0, 0, 0, 0, 10);
                 Sensor2.SensorDataTriggerMode = DataTriggerMode.External;
                 Sensor2.DataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor2.externalTriggerParameter = new ExternalTriggerParameter(19, 0, TriggerEdgeMode.RisingEdge);
+                Sensor2.externalTriggerParameter = new ExternalTriggerParameter(12, 0, TriggerEdgeMode.RisingEdge);
                 Sensor2.SensorInternalTriggerFreq = 5000;
                 Sensor2.StartTriggerEnable = Enabled;
                 Sensor2.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
                 Sensor2.TiltAnglePitch = 0f;
                 Sensor2.TiltAngleYaw = 0f;
-                Sensor2.TransportResolution = 0.019f;
+                Sensor2.TransportResolution = 0.012f;
                 Sensor2.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor2.ZmapResolution = new ZmapResolution(0.001f, 0.019f);
+                Sensor2.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
                 log.Info($"{Sensor2.SensorModel}");
-                //if (Sensor2.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
-                //{
-                //    Sensor2.HorizentalBinningMode = BinningMode.X2;
-                //    Sensor2.VerticalBinningMode = BinningMode.X2;
+                if (Sensor2.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
+                {
+                    Sensor2.HorizentalBinningMode = BinningMode.X2;
+                    Sensor2.VerticalBinningMode = BinningMode.X2;
 
-                //}
+                }
                 List<ExposureGain> exposureGains = new List<ExposureGain>
                 {
                     //exposureGains.Add(new ExposureGain(4d, 3));
@@ -182,7 +182,7 @@ namespace APIX_Winform_Demo
                 };
                 Sensor2.ExposuresAndGains = exposureGains;
 
-                Sensor2.SensorROI = new ROI(0, 4096, 478, 468);
+                Sensor2.SensorROI = new ROI(0, 4096, 800, 60);
 
                 //Sensor2.SmartXPress = @"C:\SmartRay\SmartRay DevKit\SR_API\smartxpress\GuageBlock_Test01.sxp";
                 //Sensor2.SmartXAct = SmartXactModeType.Metrology;
@@ -202,10 +202,11 @@ namespace APIX_Winform_Demo
 
         private void Sensor1_SensorImageEvent(object sensor, SRImageHandlerArgument SRimageHandlerArgument)
         {
-            log.Info("Acquisition completed, trigger the sensor again and display");
             //Sensor1.WriteIO(DigitalOutput.Channel2);
 
             var tempSensor = sensor as APIXSensor;
+            log.Info(tempSensor.SensorModel+ ":Acquisition completed, trigger the sensor again and display");
+
 
             //Cross thread to display image and save files
             new Task(new Action(() =>
@@ -430,7 +431,8 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor SmartXPress parameters:" + Sensor1.SmartXPress);
                 log.Info("Sensor SmartXact mode:" + Sensor1.SmartXAct);
                 log.Info("Sensor Callback timeout:" + Sensor1.CallBackTimeout.Interval);
-                var s = await Sensor1.StartAcquisition();
+                var s0 = await Sensor1.StartAcquisition();
+                var s1 = await Sensor2.StartAcquisition();
                 if (Sensor1.SensorModel != null)
                 {
                     if (Sensor1.SensorModel.Contains("ECCO X"))//binning mode just support the ECCO X series sensors
@@ -445,8 +447,10 @@ namespace APIX_Winform_Demo
             else if (!isStarted)
             {
                 log.Info("Sensor stop acquisition");
-                var s1 = await Sensor1.StopAcquisition();
+                var s2 = await Sensor1.StopAcquisition();
+                var s3 = await Sensor2.StopAcquisition();
                 Sensor1.Clearbuffer();
+                Sensor2.Clearbuffer();
             }
 
             tbx_NumberOfProfile.Enabled = !isStarted;

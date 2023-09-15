@@ -1012,7 +1012,7 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    _sensorTempearture = sensor.GetTemperature();
+                    //_sensorTempearture = sensor.GetTemperature();
                 }
                 return _sensorTempearture;
             }

@@ -49,9 +49,9 @@
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="SmartRay_api_csharp-x64, Version=6.0.1.33, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SmartRay_api_csharp-x64, Version=6.0.1.34, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Program Files\SmartRaySDK 6.0.1.33\bin\x64\SmartRay_api_csharp-x64.dll</HintPath>
+      <HintPath>D:\Program Files\SmartRaySDK 6.0.1.34\bin\x64\SmartRay_api_csharp-x64.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />

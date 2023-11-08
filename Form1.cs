@@ -21,6 +21,9 @@ using Emgu.CV;
 using SmartRay;
 using SmartRay.Api;
 
+//define the filter
+//using SmartRay;
+
 //define log4net
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
 namespace APIX_Winform_Demo
@@ -32,6 +35,7 @@ namespace APIX_Winform_Demo
         private readonly HiPerfTimer HiPerfTimer = new HiPerfTimer();
 
         APIXSensor Sensor1 = new APIXSensor();
+        //FilterTools filterTools;
         readonly SensorHelper sensorHelper = new SensorHelper();
         public Form1()
         {
@@ -113,6 +117,7 @@ namespace APIX_Winform_Demo
                             break;
                         case ImageDataType.ZMapIntensityLaserLineThickness:
                             cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
+                           //FilterTools.SR3D_ConnectedComponentFilter_compute_2D_ui16()
                             if (ckb_EnableSaveFiles.Checked)
                             {
                                 SRimageHandlerArgument.profile_image.Save(tbx_SaveImageFilePath.Text + "\\Zmap" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
@@ -209,11 +214,11 @@ namespace APIX_Winform_Demo
                 {
                     //exposureGains.Add(new ExposureGain(4d, 3));
                    // new ExposureGain(10d, 2),
-                    new ExposureGain(10d, 3),new ExposureGain(60d, 3),
+                    new ExposureGain(4d, 3),new ExposureGain(60d, 3),
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 1920, 380, 300);
+                Sensor1.SensorROI = new ROI(0, 1920, 558, 372);
 
 
                 //Sensor1.ConfigFilePath=tbx_ConfigFilePath.Text="";

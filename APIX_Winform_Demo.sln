@@ -5,6 +5,8 @@ VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIX_Winform_Demo", "APIX_Winform_Demo.csproj", "{79B380E2-3159-4B47-A4AA-34BE9F43D58E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartrayFilterTool", "..\SmartrayFilterTool\SmartrayFilterTool.csproj", "{113F61E0-D4DC-48B3-99F5-9FF665C0C093}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{79B380E2-3159-4B47-A4AA-34BE9F43D58E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79B380E2-3159-4B47-A4AA-34BE9F43D58E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79B380E2-3159-4B47-A4AA-34BE9F43D58E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{113F61E0-D4DC-48B3-99F5-9FF665C0C093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{113F61E0-D4DC-48B3-99F5-9FF665C0C093}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{113F61E0-D4DC-48B3-99F5-9FF665C0C093}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{113F61E0-D4DC-48B3-99F5-9FF665C0C093}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

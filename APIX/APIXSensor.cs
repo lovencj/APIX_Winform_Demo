@@ -64,7 +64,7 @@ namespace APIX_Winform_Demo
             //sensor.OnZilImageNative += Sensor_OnZilImageNative;
             sensor.OnPointCloudImage += Sensor_OnPointCloudImage;
             sensor.OnIOChanged += new Sensor.OnIOChangedDelegate(OnSensorIOStatusChangedEvent);
-
+//add get sensor temperature callback function
 
 
             //intial the sensor parameters
@@ -89,6 +89,12 @@ namespace APIX_Winform_Demo
             //throw new NotImplementedException();
             //log.Info(aSensor.ToString() + "," + aInputFlags + "," + aOutputFlags);
             //log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
+            TemperatureSensorCollection tempValues= aSensor.TemperatureSensors;
+            foreach (var item in tempValues)
+            {
+                log.Info("TemperatureInfo:" + item.Name + "," + item.Description + "," + item.Temperature);
+            }
+
         }
 
         private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
@@ -1237,6 +1243,11 @@ namespace APIX_Winform_Demo
                     //sensor.SetHorizontalBinning(BinningMode.Off);
                     log.Info("Load Calibration file taken:" + timer.Duration + "ms\nSensor connected!");
                     //sensor.Granularity
+    
+
+                    //set sensor temperature parameters
+                    //sensor.
+                    
 
                     return true;
                 }

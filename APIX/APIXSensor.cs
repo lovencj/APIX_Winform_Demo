@@ -7,6 +7,7 @@ using SmartRay;
 using SmartRay.Api;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -64,7 +65,7 @@ namespace APIX_Winform_Demo
             //sensor.OnZilImageNative += Sensor_OnZilImageNative;
             sensor.OnPointCloudImage += Sensor_OnPointCloudImage;
             sensor.OnIOChanged += new Sensor.OnIOChangedDelegate(OnSensorIOStatusChangedEvent);
-//add get sensor temperature callback function
+            //add get sensor temperature callback function
 
 
             //intial the sensor parameters
@@ -89,11 +90,11 @@ namespace APIX_Winform_Demo
             //throw new NotImplementedException();
             //log.Info(aSensor.ToString() + "," + aInputFlags + "," + aOutputFlags);
             //log.Info("output ports:" + aOutputFlags);//2023年6月9日 17:51:23 SDK 6.0.1.19不起作用，始终返回0
-            TemperatureSensorCollection tempValues= aSensor.TemperatureSensors;
-            foreach (var item in tempValues)
-            {
-                log.Info("TemperatureInfo:" + item.Name + "," + item.Description + "," + item.Temperature);
-            }
+            //TemperatureSensorCollection tempValues = aSensor.TemperatureSensors;
+            //foreach (var item in tempValues)
+            //{
+            //    log.Info("TemperatureInfo:" + item.Name + "," + item.Description + "," + item.Temperature);
+            //}
 
         }
 
@@ -130,8 +131,9 @@ namespace APIX_Winform_Demo
 
                     imageheight = (uint)intensityImage.Height,
                     imagewidth = (uint)intensityImage.Width,
-                    pointcloud = point3Fs.ToArray()
+                    pointcloud = point3Fs.ToArray<Point3F[]>(),
                 };
+                //var cc1=point3Fs.ToArray<Point3F[][]>();
                 //trigger event
                 this.SensorImageEvent(this, sRImageHandlerArgument);
                 //release memorey objects
@@ -576,6 +578,22 @@ namespace APIX_Winform_Demo
                 }
             }
         }
+
+        private TemperatureSensorCollection _sensorTemp2rd;
+
+        public TemperatureSensorCollection SensorTemp2rd
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _sensorTemp2rd = sensor.TemperatureSensors;
+                }
+                return _sensorTemp2rd;
+            }
+        }
+
+
 
 
         private UInt32 _PackSize;
@@ -1117,14 +1135,33 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    xEnhancement = sensor.GetCalibrationDataXEnhancement();
+                    try
+                    {
+                        xEnhancement = sensor.GetCalibrationDataXEnhancement();
+
+                    }
+                    catch (Exception ce)
+                    {
+                        log.Error(ce+"\nThe sensor can't support XEnhancement Feature!");
+                        xEnhancement =false;
+                    }
                 }
                 return xEnhancement;
             }
             set
             {
                 if (_isSensorConnected)
-                    sensor.SetCalibrationDataXEnhancement(value);
+{
+                    try
+                    {
+                        sensor.SetCalibrationDataXEnhancement(value);
+                    }
+                    catch (Exception ce)
+                    {
+                        log.Error(ce + "\nThe sensor can't support XEnhancement Feature!");
+                        value=false;
+                    }
+                }
                 xEnhancement = value;
             }
         }
@@ -1223,6 +1260,32 @@ namespace APIX_Winform_Demo
         }
 
 
+
+        private SmartXactModeType _SmartXact;
+
+        public SmartXactModeType SmartXact
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _SmartXact = sensor.GetSmartXactMode();
+                }
+
+                return _SmartXact;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetSmartXactMode(value);
+                }
+                _SmartXact = value;
+            }
+        }
+
+
+
         #endregion
         #region functions
         public Task<bool> Connect()
@@ -1243,11 +1306,11 @@ namespace APIX_Winform_Demo
                     //sensor.SetHorizontalBinning(BinningMode.Off);
                     log.Info("Load Calibration file taken:" + timer.Duration + "ms\nSensor connected!");
                     //sensor.Granularity
-    
+
 
                     //set sensor temperature parameters
                     //sensor.
-                    
+
 
                     return true;
                 }

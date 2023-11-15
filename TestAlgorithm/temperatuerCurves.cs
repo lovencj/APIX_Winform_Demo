@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace APIX_Winform_Demo.TestAlgorithm
 {
-    public class temperatuerCurves
+    public class TemperatuerCurves
     {
 
         public unsafe T[,] RowToArrD<T>(T[] src, int row)
@@ -36,7 +36,7 @@ namespace APIX_Winform_Demo.TestAlgorithm
             var SourceDataRow = SourceData.pointcloud[0];
             Point3F[] SourceDataRowMiddle = SourceDataRow.Skip((int)(SourceData.imagewidth * (SourceData.imageheight / 2))).Take((int)SourceData.imagewidth).ToArray();
             //分割数据
-            var segement1 = SourceDataRowMiddle.TakeWhile<Point3F>(a => a.Z > 0).ToArray();
+            var segement1 = SourceDataRowMiddle.Where<Point3F>(a => a.Z > 0).ToArray();
             var segement2 = SourceDataRowMiddle.Where<Point3F>(a => a.Z < 0 && a.Z > -999).ToArray();
             //0上的拟合直线
             PointF[] InputPoints = Enumerable.Range(0, segement1.Length).Select(i => new PointF(segement1[i].Y, segement1[i].Z)).ToArray();
@@ -70,7 +70,7 @@ namespace APIX_Winform_Demo.TestAlgorithm
             for (int i = 0; i < 1920;)
             {
                float aa= Enumerable.Range(i, step).Select(s => new PointF(SourceDataRowMiddle[s].Y, SourceDataRowMiddle[s].Z)).Where<PointF>(a => a.Y > -99).Select(k=>k.Y).Average();
-               i=i + step;
+                i += step;
                 result.Add((float)aa);
 //SourceDataRowMiddle.R
             }

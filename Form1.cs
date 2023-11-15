@@ -37,7 +37,7 @@ namespace APIX_Winform_Demo
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private bool isStarted = false;
         private readonly HiPerfTimer HiPerfTimer = new HiPerfTimer();
-private temperatuerCurves temperatuerCurvesTool=new temperatuerCurves();
+private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
 
         APIXSensor Sensor1 = new APIXSensor();
         //FilterTools filterTools;

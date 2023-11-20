@@ -1,19 +1,14 @@
 ﻿using Emgu.CV;
-using Emgu.CV.Structure;
 using SmartRay.Api;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace APIX_Winform_Demo.TestAlgorithm
 {
     public class TemperatuerCurves
     {
-
         public unsafe T[,] RowToArrD<T>(T[] src, int row)
         {
             if (src.Length % row != 0) return null;
@@ -28,11 +23,9 @@ namespace APIX_Winform_Demo.TestAlgorithm
             return dst;
         }
 
-
         public List<float> SegementData(SRImageHandlerArgument SourceData)
         {
-
-            List<float> result= new List<float>();
+            List<float> result = new List<float>();
             var SourceDataRow = SourceData.pointcloud[0];
             Point3F[] SourceDataRowMiddle = SourceDataRow.Skip((int)(SourceData.imagewidth * (SourceData.imageheight / 2))).Take((int)SourceData.imagewidth).ToArray();
             //分割数据
@@ -41,7 +34,9 @@ namespace APIX_Winform_Demo.TestAlgorithm
             //0上的拟合直线
             PointF[] InputPoints = Enumerable.Range(0, segement1.Length).Select(i => new PointF(segement1[i].Y, segement1[i].Z)).ToArray();
             PointF[] MeasurementPoints = Enumerable.Range(0, segement2.Length).Select(i => new PointF(segement2[i].Y, segement2[i].Z)).ToArray();
+
             #region measure the height
+
             double param = 0;//距离模型中的数值参数C
             double reps = 1e-6;//坐标原点到直线之间的距离精度
             double aeps = 1e-6;//角度精度
@@ -55,30 +50,29 @@ namespace APIX_Winform_Demo.TestAlgorithm
             }
 
             distances.Sort();
-            var results= Enumerable.Range((int)(distances.Count*0.15), (int)(distances.Count * 0.85)).Select(i=> distances[i]).ToArray();
+            var results = Enumerable.Range((int)(distances.Count * 0.15), (int)(distances.Count * 0.85)).Select(i => distances[i]).ToArray();
             float averageHeight = results.Average();
             float maxHeight = results.Max();
-            
+
             float minHeight = results.Min();
             result.Add(averageHeight);
             result.Add(maxHeight);
             result.Add(minHeight);
 
-            #endregion
+            #endregion measure the height
+
             #region 分区域直接获取Z的高度,分192份，192
+
             int step = 20;
             for (int i = 0; i < 1920;)
             {
-               float aa= Enumerable.Range(i, step).Select(s => new PointF(SourceDataRowMiddle[s].Y, SourceDataRowMiddle[s].Z)).Where<PointF>(a => a.Y > -99).Select(k=>k.Y).Average();
+                float aa = Enumerable.Range(i, step).Select(s => new PointF(SourceDataRowMiddle[s].Y, SourceDataRowMiddle[s].Z)).Where<PointF>(a => a.Y > -99).Select(k => k.Y).Average();
                 i += step;
                 result.Add((float)aa);
-//SourceDataRowMiddle.R
             }
             return result;
-            //Console.WriteLine(distances.Count);
-            #endregion
 
+            #endregion 分区域直接获取Z的高度,分192份，192
         }
-
     }
 }

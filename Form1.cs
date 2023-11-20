@@ -1,35 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Diagnostics;
+﻿using APIX_Winform_Demo.TestAlgorithm;
 
 //define log4net
 using log4net;
 
 //define Emgu.CV
-using Emgu;
-using Emgu.CV;
-
 
 //define Smartray APiX
 using SmartRay;
 using SmartRay.Api;
-using APIX_Winform_Demo.TestAlgorithm;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Threading;
-
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 //define the filter
 //using SmartRay;
 
 //define log4net
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
+
 namespace APIX_Winform_Demo
 {
     public partial class Form1 : Form
@@ -37,11 +29,13 @@ namespace APIX_Winform_Demo
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private bool isStarted = false;
         private readonly HiPerfTimer HiPerfTimer = new HiPerfTimer();
-private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
+        private readonly TemperatuerCurves temperatuerCurvesTool = new TemperatuerCurves();
 
-        APIXSensor Sensor1 = new APIXSensor();
+        private APIXSensor Sensor1 = new APIXSensor();
+
         //FilterTools filterTools;
-        readonly SensorHelper sensorHelper = new SensorHelper();
+        private readonly SensorHelper sensorHelper = new SensorHelper();
+
         public Form1()
         {
             InitializeComponent();
@@ -55,19 +49,17 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             gbx_SaveImage.Visible = false;
             gbx_StartAcquisition.Visible = false;
 
-            btn_StartAcquisition.Enabled= false;
-            btn_SimulateTrigger.Enabled= false;
-
+            btn_StartAcquisition.Enabled = false;
+            btn_SimulateTrigger.Enabled = false;
 
             log.Info("The UI initialed!");
             HiPerfTimer.Start();
-            initSR_APIx();
+            InitSR_APIx();
             HiPerfTimer.Stop();
             log.Info("Initial APIx taken:" + HiPerfTimer.Duration + "ms");
         }
 
-
-        private bool initSR_APIx()
+        private bool InitSR_APIx()
         {
             //get the apix version
             ApiManager.Initialize();
@@ -101,6 +93,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                             }
 
                             break;
+
                         case ImageDataType.ProfileIntensityLaserLineThickness:
                             cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
                             if (ckb_EnableSaveFiles.Checked)
@@ -108,10 +101,10 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                                 SRimageHandlerArgument.profile_image.Save(tbx_SaveImageFilePath.Text + "\\ProfileImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
                                 SRimageHandlerArgument.intensity_image.Save(tbx_SaveImageFilePath.Text + "\\IntensityImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
                                 SRimageHandlerArgument.intensity_image.Save(tbx_SaveImageFilePath.Text + "\\LaserLineThicknessImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
-
                             }
 
                             break;
+
                         case ImageDataType.ZMap:
                             cv_imageBox1.Image = SRimageHandlerArgument.profile_image;
                             if (ckb_EnableSaveFiles.Checked)
@@ -120,9 +113,10 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                             }
 
                             break;
+
                         case ImageDataType.ZMapIntensityLaserLineThickness:
                             cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
-                           //FilterTools.SR3D_ConnectedComponentFilter_compute_2D_ui16()
+                            //FilterTools.SR3D_ConnectedComponentFilter_compute_2D_ui16()
                             if (ckb_EnableSaveFiles.Checked)
                             {
                                 SRimageHandlerArgument.profile_image.Save(tbx_SaveImageFilePath.Text + "\\Zmap" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
@@ -130,8 +124,8 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                                 SRimageHandlerArgument.intensity_image.Save(tbx_SaveImageFilePath.Text + "\\ZmapLaserLineThicknessImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
                             }
 
-
                             break;
+
                         case ImageDataType.LiveImage:
                             cv_imageBox1.Image = SRimageHandlerArgument.liveimage;
                             if (ckb_EnableSaveFiles.Checked)
@@ -139,12 +133,12 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                                 SRimageHandlerArgument.liveimage.Save(tbx_SaveImageFilePath.Text + "\\ProfileImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".bmp");
                             }
 
-
                             break;
+
                         case ImageDataType.PointCloud:
                             cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
                             //temperatuerCurvesTool.RowToArrD(SRimageHandlerArgument.pointcloud[0], (int)SRimageHandlerArgument.imageheight);
-                            var res=temperatuerCurvesTool.SegementData(SRimageHandlerArgument);
+                            var res = temperatuerCurvesTool.SegementData(SRimageHandlerArgument);
                             var temp = tempSensor.SensorTemp2rd;
                             if (ckb_EnableSaveFiles.Checked)
                             {
@@ -154,7 +148,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                                 string resultString = string.Empty;
                                 foreach (var item in temp)
                                 {
-                                    resultString += item.Temperature.ToString("0.000")+",";
+                                    resultString += item.Temperature.ToString("0.000") + ",";
                                 }
                                 foreach (var item in res)
                                 {
@@ -169,11 +163,10 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                             }
 
                             break;
+
                         default:
                             break;
                     }
-
-
                 }));
 
                 tbx_SensorTempetature.Invoke((Action)(() =>
@@ -186,24 +179,22 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                 }));
                 this.Invoke((Action)(() =>
                 {
-                    this.Text= "Current Scan rate: "+tempSensor.CurrentScanRate.CurrentScanRate.ToString()+",is overflow: "+ tempSensor.CurrentScanRate.isTriggerOverflow.ToString();
+                    this.Text = "Current Scan rate: " + tempSensor.CurrentScanRate.CurrentScanRate.ToString() + ",is overflow: " + tempSensor.CurrentScanRate.isTriggerOverflow.ToString();
                     //tbx_SensorTempetature.Text = tempSensor.SensorTemperature.ToString("0.00") + "℃";//it's not working with ECCO X series sensor
                 }));
             })).Start();
             GC.Collect();
 
-            Thread.Sleep(1000*10);
+            Thread.Sleep(1000 * 10);
             Sensor1.WriteIO(DigitalOutput.Channel2);
-
         }
 
         private void OnSensorMessgae(MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
         {
-
             //throw new NotImplementedException();
         }
 
-        private async void btn_InitialSensor_Click(object sender, EventArgs e)
+        private async void Btn_InitialSensor_Click(object sender, EventArgs e)
         {
             HiPerfTimer.Start();
             var result = await Sensor1.Connect();
@@ -219,7 +210,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
                 Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
                 Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0,TriggerEdgeMode.RisingEdge);
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0, TriggerEdgeMode.RisingEdge);
                 Sensor1.SensorInternalTriggerFreq = 1000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
@@ -271,7 +262,6 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                 btn_StartAcquisition.Enabled = true;
                 btn_SimulateTrigger.Enabled = true;
 
-
                 tbx_APIXVersion.Text = ApiManager.Version;
                 tbx_SensorModel.Text = Sensor1.SensorModel;
                 tbx_FirmwareVersion.Text = Sensor1.SensorFWVersion;
@@ -285,7 +275,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             }
         }
 
-        private void btn_SaveConfigrationFile_Click(object sender, EventArgs e)
+        private void Btn_SaveConfigrationFile_Click(object sender, EventArgs e)
         {
             //Sensor1.SaveParameterSet("MyParameters.json");
             SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -293,7 +283,6 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                 Title = "please select your file path:",
                 RestoreDirectory = true,
                 Filter = "*.json|*.json|*.par|*.par|All files(*.*)|*.*",
-
             };
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -302,7 +291,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             //Sensor1.SaveSensorParameters(Sensor1.SensorModel.Substring(0, 12) + "_" + DateTime.Now.ToString("yyyyMMddHHmm-ss-fff") + "_PC.json");
         }
 
-        private async void btn_StartAcquisition_Click(object sender, EventArgs e)
+        private async void Btn_StartAcquisition_Click(object sender, EventArgs e)
         {
             isStarted = !isStarted;
             if (isStarted)
@@ -315,15 +304,15 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                 log.Info("Sensor acquisition mode:" + Sensor1.AcquisitionMode);
                 log.Info("Sensor pitch angle:" + Sensor1.TiltAnglePitch);
                 log.Info("Sensor Yaw angle:" + Sensor1.TiltAngleYaw);
-                log.Info("Sensor X enhancement:"+Sensor1.XEhancement);
+                log.Info("Sensor X enhancement:" + Sensor1.XEhancement);
                 log.Info("Sensor Data Trigger mode:" + Sensor1.SensorDataTriggerMode);
                 log.Info("Sensor Data Trigger source:" + Sensor1.DataTriggerSource);
                 log.Info("Sensor data trigger parameters:" + "Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider + ", Trigger delay:" + Sensor1.externalTriggerParameter.TriggerDelay + ", Trigger Edge mode:" + Sensor1.externalTriggerParameter.TriggerEdgeMode);
                 log.Info("Sensor Maximun scan rate:" + Sensor1.MaximumScanRate + ", Distance Pre circle:" + Sensor1.DistancePreCircle + ", Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Maximun running speed is: MaximumScanRate x DistancePreCircle x TriggerDivider=" + Sensor1.MaximumScanRate * Sensor1.DistancePreCircle * Sensor1.externalTriggerParameter.TriggerDivider);
-                log.Info("Sensor Zmap Resolution: Vertical Resolution:"+Sensor1.ZmapResolution.VerticalResolution.ToString()+", Laterval Resolution:"+Sensor1.ZmapResolution.LatervalResolution);
-                var s = await Sensor1.StartAcquisition();
-                if (Sensor1.SensorModel!=null) 
+                log.Info("Sensor Zmap Resolution: Vertical Resolution:" + Sensor1.ZmapResolution.VerticalResolution.ToString() + ", Laterval Resolution:" + Sensor1.ZmapResolution.LatervalResolution);
+                await Sensor1.StartAcquisition();
+                if (Sensor1.SensorModel != null)
                 {
                     if (Sensor1.SensorModel.Contains("ECCO X"))//binning mode just support the ECCO X series sensors
                     {
@@ -332,12 +321,11 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
                     }
                 }
                 // var s1 = await Sensor1.WriteIO(DigitalOutput.Channel2);
-
             }
             else if (!isStarted)
             {
                 log.Info("Sensor stop acquisition");
-                var s1 = await Sensor1.StopAcquisition();
+                await Sensor1.StopAcquisition();
                 Sensor1.Clearbuffer();
             }
 
@@ -355,13 +343,12 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             comboBox_ImageType.Enabled = !isStarted;
         }
 
-        private void btn_SimulateTrigger_Click(object sender, EventArgs e)
+        private void Btn_SimulateTrigger_Click(object sender, EventArgs e)
         {
             Sensor1.WriteIO(DigitalOutput.Channel2);
-
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void TextBox1_TextChanged(object sender, EventArgs e)
         {
             if (Sensor1.IsSensorConnected)
             {
@@ -369,7 +356,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             }
         }
 
-        private void tBx_PacketSize_TextChanged(object sender, EventArgs e)
+        private void TBx_PacketSize_TextChanged(object sender, EventArgs e)
         {
             if (Sensor1.IsSensorConnected)
             {
@@ -377,7 +364,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             }
         }
 
-        private void tBx_PacketTimeout_TextChanged(object sender, EventArgs e)
+        private void TBx_PacketTimeout_TextChanged(object sender, EventArgs e)
         {
             if (Sensor1.IsSensorConnected)
             {
@@ -385,7 +372,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             }
         }
 
-        private void btn_LoadConfig_Click(object sender, EventArgs e)
+        private void Btn_LoadConfig_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -401,13 +388,12 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             }
         }
 
-        private void btn_ChooseSaveFilePath_Click(object sender, EventArgs e)
+        private void Btn_ChooseSaveFilePath_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog mSaveFileDialog = new FolderBrowserDialog
             {
                 Description = "please select your save file path:",
                 ShowNewFolderButton = true,
-
             };
             if (mSaveFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -415,7 +401,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             }
         }
 
-        private void comboBox_ImageType_SelectedValueChanged(object sender, EventArgs e)
+        private void ComboBox_ImageType_SelectedValueChanged(object sender, EventArgs e)
         {
             ComboBox comboBox = sender as ComboBox;
             if (comboBox.SelectedIndex == 0)
@@ -442,10 +428,9 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
             {
                 Sensor1.AcquisitionType = ImageAcquisitionType.PointCloud;
             }
-
         }
 
-        private void ckb_EnableHorizentalBinning_CheckedChanged(object sender, EventArgs e)
+        private void Ckb_EnableHorizentalBinning_CheckedChanged(object sender, EventArgs e)
         {
             if ((sender as CheckBox).Name == "ckb_EnableHorizentalBinning")
             {
@@ -463,7 +448,7 @@ private TemperatuerCurves temperatuerCurvesTool=new TemperatuerCurves();
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Sensor1!=null & Sensor1.IsSensorConnected)
+            if (Sensor1 != null & Sensor1.IsSensorConnected)
             {
                 Sensor1.Dispose();
                 Sensor1 = null;

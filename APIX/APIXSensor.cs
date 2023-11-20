@@ -1,7 +1,9 @@
 ﻿//define Emgu.CV
 using Emgu.CV;
+
 //define log4net
 using log4net;
+
 //define Smartray APiX
 using SmartRay;
 using SmartRay.Api;
@@ -13,11 +15,10 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 //[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]
 namespace APIX_Winform_Demo
 {
-    class APIXSensor : IDisposable
+    internal class APIXSensor : IDisposable
     {
         private readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -29,13 +30,12 @@ namespace APIX_Winform_Demo
         private Mat intensityImage = new Mat();
         private Mat laserlinethicknessImage = new Mat();
         private readonly HiPerfTimer timer = new HiPerfTimer();
-        //test for pointcloud data management list 
+
+        //test for pointcloud data management list
         private readonly List<Point3F[]> point3Fs = new List<Point3F[]>();
 
         //meta data managment
         private readonly List<MetaDataCollection> metaDataCollectionList = new List<MetaDataCollection>();
-
-
 
         /// <summary>
         /// 2. define event delegate
@@ -67,7 +67,6 @@ namespace APIX_Winform_Demo
             sensor.OnIOChanged += new Sensor.OnIOChangedDelegate(OnSensorIOStatusChangedEvent);
             //add get sensor temperature callback function
 
-
             //intial the sensor parameters
             this._IPAddress = "192.168.178.200";//default IPAddress
             this._portNumber = 40;//default port number;
@@ -83,6 +82,7 @@ namespace APIX_Winform_Demo
             this._currentScanRate = new CurrentScanRateStruct();
             this._distancePreCircle = 0.001d;
         }
+
         #region callback functions
 
         private void OnSensorIOStatusChangedEvent(Sensor aSensor, byte aInputFlags, byte aOutputFlags)
@@ -95,7 +95,6 @@ namespace APIX_Winform_Demo
             //{
             //    log.Info("TemperatureInfo:" + item.Name + "," + item.Description + "," + item.Temperature);
             //}
-
         }
 
         private void Sensor_OnPointCloudImage(Sensor aSensor, ImageDataType aImageDataType, uint aNumPoints, uint aNumProfiles, Point3F[] aPointCloudImageData, ushort[] aIntensityImageData, ushort[] aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
@@ -122,7 +121,6 @@ namespace APIX_Winform_Demo
 
             if (intensityImage.Height == _NumberOfProfileToCapture)
             {
-
                 SRImageHandlerArgument sRImageHandlerArgument = new SRImageHandlerArgument
                 {
                     intensity_image = intensityImage.Clone(),
@@ -145,9 +143,7 @@ namespace APIX_Winform_Demo
                 ProfileCounter = 0;
                 timer.Stop();
                 //  log.Info("PointCloud taken:" + timer.Duration + "ms");
-
             }
-
         }
 
         private void Sensor_OnZilImageNative(Sensor aSensor, ImageDataType aImageDataType, int aHeight, int aWidth, float aVerticalRes, float aHorizontalRes, IntPtr aZMapImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, float aOriginYMillimeters)
@@ -155,7 +151,6 @@ namespace APIX_Winform_Demo
             ProfileCounter++;
 
             //log.Info("ZIL native callback");
-
 
             switch (aImageDataType)
             {
@@ -166,6 +161,7 @@ namespace APIX_Winform_Demo
                     Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
 
                     break;
+
                 case ImageDataType.ZMapIntensityLaserLineThickness:
                     Mat _profileMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aZMapImageData, aWidth * sizeof(UInt16));
                     profileimage.PushBack(_profileMatimage1);
@@ -176,19 +172,18 @@ namespace APIX_Winform_Demo
                     _profileMatimage1.Dispose();
                     _intensityMatimage1.Dispose();
                     _llTImage1.Dispose();
-                    //release unused memory 
+                    //release unused memory
                     Marshal.Release(aZMapImageData); aZMapImageData = IntPtr.Zero;
                     Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
                     Marshal.Release(aLaserLineThicknessImageData); aLaserLineThicknessImageData = IntPtr.Zero;
 
                     break;
+
                 default:
                     break;
             }
 
-
             log.Info("Native ZIL image height:" + profileimage.Height);
-
 
             if (profileimage.Height == _NumberOfProfileToCapture)
             {
@@ -210,7 +205,6 @@ namespace APIX_Winform_Demo
                 intensityImage = new Mat();
                 laserlinethicknessImage.Dispose();
                 laserlinethicknessImage = new Mat();
-
             }
         }
 
@@ -230,6 +224,7 @@ namespace APIX_Winform_Demo
                     }
 
                     break;
+
                 case ImageDataType.ZMapIntensityLaserLineThickness:
                     unsafe
                     {
@@ -247,6 +242,7 @@ namespace APIX_Winform_Demo
                         _LLtMatimage.Dispose();
                     }
                     break;
+
                 default:
                     break;
             }
@@ -274,7 +270,6 @@ namespace APIX_Winform_Demo
             }
 
             //log.Info("ZIL  callback");
-
         }
 
         private void Sensor_OnPilImageNative(Sensor aSensor, ImageDataType aImageDataType, int aOriginX, int aHeight, int aWidth, IntPtr aProfileImageData, IntPtr aIntensityImageData, IntPtr aLaserLineThicknessImageData, MetaDataCollection aMetaDataCollection)
@@ -282,7 +277,6 @@ namespace APIX_Winform_Demo
             ProfileCounter++;
 
             //log.Info("ZIL native callback");
-
 
             switch (aImageDataType)
             {
@@ -293,6 +287,7 @@ namespace APIX_Winform_Demo
                     Marshal.Release(aProfileImageData); aProfileImageData = IntPtr.Zero;
 
                     break;
+
                 case ImageDataType.ProfileIntensityLaserLineThickness:
                     Mat _profileMatimage1 = new Mat(aHeight, aWidth, Emgu.CV.CvEnum.DepthType.Cv16U, 1, aProfileImageData, aWidth * sizeof(UInt16));
                     profileimage.PushBack(_profileMatimage1);
@@ -303,11 +298,12 @@ namespace APIX_Winform_Demo
                     _profileMatimage1.Dispose();
                     _intensityMatimage.Dispose();
                     _llTImage.Dispose();
-                    //release unused memory 
+                    //release unused memory
                     Marshal.Release(aProfileImageData); aProfileImageData = IntPtr.Zero;
                     Marshal.Release(aIntensityImageData); aIntensityImageData = IntPtr.Zero;
                     Marshal.Release(aLaserLineThicknessImageData); aLaserLineThicknessImageData = IntPtr.Zero;
                     break;
+
                 default:
                     break;
             }
@@ -345,8 +341,6 @@ namespace APIX_Winform_Demo
                 laserlinethicknessImage.Dispose();
                 laserlinethicknessImage = new Mat();
                 metaDataCollectionList.Clear();
-
-
             }
         }
 
@@ -365,6 +359,7 @@ namespace APIX_Winform_Demo
                     }
 
                     break;
+
                 case ImageDataType.ProfileIntensityLaserLineThickness:
                     unsafe
                     {
@@ -383,6 +378,7 @@ namespace APIX_Winform_Demo
                         _llTImage.Dispose();
                     }
                     break;
+
                 default:
                     break;
             }
@@ -421,7 +417,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private void OnLiveImageEvent(Sensor aSensor, int aOriginX, int aWidth, int aHeight, IntPtr aImageDataPtr)
         {
             //throw new NotImplementedException();
@@ -434,7 +429,6 @@ namespace APIX_Winform_Demo
             sRImageHandlerArgument.liveimage = _liveImage.Clone();
             _liveImage.Dispose();
             this.SensorImageEvent(this, sRImageHandlerArgument);
-
         }
 
         private void OnSensorMessageEvent(Sensor aSensor, MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
@@ -460,12 +454,9 @@ namespace APIX_Winform_Demo
             }
         }
 
-
-
         private void OnDisconnectedEvent(Sensor aSensor)
         {
             this._isSensorConnected = false;
-
         }
 
         private void OnConnectedEvent(Sensor aSensor)
@@ -473,8 +464,10 @@ namespace APIX_Winform_Demo
             this._isSensorConnected = true;
         }
 
-        #endregion
+        #endregion callback functions
+
         #region sensor parameters propetys
+
         private string _IPAddress;
 
         public string MIPAddress
@@ -490,7 +483,6 @@ namespace APIX_Winform_Demo
             get { return _portNumber; }
             set { _portNumber = value; }
         }
-
 
         private long _ConnectionTimeout;
 
@@ -516,7 +508,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private bool _isSensorConnected;
 
         public bool IsSensorConnected
@@ -524,7 +515,6 @@ namespace APIX_Winform_Demo
             get { return _isSensorConnected; }
             set { _isSensorConnected = value; }
         }
-
 
         private ImageAcquisitionType _AcquisitionType;
 
@@ -593,9 +583,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
-
-
         private UInt32 _PackSize;
 
         public UInt32 PackSize
@@ -617,7 +604,6 @@ namespace APIX_Winform_Demo
                 }
             }
         }
-
 
         private uint _PacketCounter;
 
@@ -652,8 +638,8 @@ namespace APIX_Winform_Demo
                     _maximumScanrate = sensor.GetMaximumScanRate();
                 return _maximumScanrate;
             }
-
         }
+
         private int _transmissionRate;
 
         public int TransmissionRate
@@ -694,7 +680,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private TimeSpan _PacketTimeout;
 
         public TimeSpan PacketTimeout
@@ -729,7 +714,6 @@ namespace APIX_Winform_Demo
                 }
                 return _Granularity;
             }
-
         }
 
         private ROI _aROI;
@@ -763,7 +747,6 @@ namespace APIX_Winform_Demo
                         try
                         {
                             sensor.SetROI(value.StartX, value.Width, value.StartY, value.Height);
-
                         }
                         catch (Exception ce)
                         {
@@ -806,7 +789,6 @@ namespace APIX_Winform_Demo
                 if (_isSensorConnected)
                 {
                     _sensorInternalTriggerFreq = (uint)sensor.GetDataTriggerInternalFrequency();
-
                 }
                 return _sensorInternalTriggerFreq;
             }
@@ -862,9 +844,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
-
-
         private bool _StartTriggerEnable;
 
         public bool StartTriggerEnable
@@ -887,10 +866,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
-
-
-
         private List<ExposureGain> _exposuresAndgains;
 
         public List<ExposureGain> ExposuresAndGains
@@ -911,7 +886,6 @@ namespace APIX_Winform_Demo
                 else
                 {
                     log.Warn("sensor not connected,can't get the exposure time and gain values");
-
                 }
                 return _exposuresAndgains;
             }
@@ -944,7 +918,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private AcquisitionMode _acquistionMode;
 
         public AcquisitionMode AcquisitionMode
@@ -966,7 +939,6 @@ namespace APIX_Winform_Demo
                 _acquistionMode = value;
             }
         }
-
 
         private BinningMode _horizentalBinningMode;
 
@@ -1012,7 +984,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private string _SensorFWVersion;
 
         public string SensorFWVersion
@@ -1027,7 +998,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private float _sensorTempearture;
 
         public float SensorTemperature
@@ -1040,9 +1010,7 @@ namespace APIX_Winform_Demo
                 }
                 return _sensorTempearture;
             }
-
         }
-
 
         private float _tiltAnglePitch;
 
@@ -1066,7 +1034,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private float _tiltAngleYaw;
 
         public float TiltAngleYaw
@@ -1089,8 +1056,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
-
         private string _sensorModel;
 
         public string SensorModel
@@ -1104,7 +1069,6 @@ namespace APIX_Winform_Demo
                 return _sensorModel;
             }
         }
-
 
         private float _transportResolution;
 
@@ -1126,7 +1090,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
         private bool xEnhancement;
 
         public bool XEhancement
@@ -1138,12 +1101,11 @@ namespace APIX_Winform_Demo
                     try
                     {
                         xEnhancement = sensor.GetCalibrationDataXEnhancement();
-
                     }
                     catch (Exception ce)
                     {
-                        log.Error(ce+"\nThe sensor can't support XEnhancement Feature!");
-                        xEnhancement =false;
+                        log.Error(ce + "\nThe sensor can't support XEnhancement Feature!");
+                        xEnhancement = false;
                     }
                 }
                 return xEnhancement;
@@ -1151,7 +1113,7 @@ namespace APIX_Winform_Demo
             set
             {
                 if (_isSensorConnected)
-{
+                {
                     try
                     {
                         sensor.SetCalibrationDataXEnhancement(value);
@@ -1159,12 +1121,13 @@ namespace APIX_Winform_Demo
                     catch (Exception ce)
                     {
                         log.Error(ce + "\nThe sensor can't support XEnhancement Feature!");
-                        value=false;
+                        value = false;
                     }
                 }
                 xEnhancement = value;
             }
         }
+
         private MetaDataLevel mMetaDataLevel;
 
         public MetaDataLevel MetaDataLevel
@@ -1205,6 +1168,7 @@ namespace APIX_Winform_Demo
         }
 
         private string _SmartXTract;
+
         public string SmartXTract
         {
             get
@@ -1230,6 +1194,7 @@ namespace APIX_Winform_Demo
         }
 
         private string _SmartXPress;
+
         public string SmartXPrress
         {
             get
@@ -1259,8 +1224,6 @@ namespace APIX_Winform_Demo
             }
         }
 
-
-
         private SmartXactModeType _SmartXact;
 
         public SmartXactModeType SmartXact
@@ -1284,10 +1247,10 @@ namespace APIX_Winform_Demo
             }
         }
 
+        #endregion sensor parameters propetys
 
-
-        #endregion
         #region functions
+
         public Task<bool> Connect()
         {
             Task<bool> connecctsensortask = new Task<bool>(() =>
@@ -1307,10 +1270,8 @@ namespace APIX_Winform_Demo
                     log.Info("Load Calibration file taken:" + timer.Duration + "ms\nSensor connected!");
                     //sensor.Granularity
 
-
                     //set sensor temperature parameters
                     //sensor.
-
 
                     return true;
                 }
@@ -1319,12 +1280,10 @@ namespace APIX_Winform_Demo
                     log.Error("sensor can't be connected, the error message as below:\n" + ce.Message);
                     return false;
                 }
-
             });
 
             connecctsensortask.Start();
             return connecctsensortask;
-
         }
 
         public Task<bool> StartAcquisition()
@@ -1358,7 +1317,6 @@ namespace APIX_Winform_Demo
             return startacqTask;
         }
 
-
         public Task<bool> StopAcquisition()
         {
             Task<bool> stopAcqTask = new Task<bool>(() =>
@@ -1383,13 +1341,10 @@ namespace APIX_Winform_Demo
                     log.Error("Execute sensor stop acquisition failed,\nPlease check the sensor status, the error message as below:\n" + ce.Message);
                 }
                 return stopAcqusition;
-
             });
             stopAcqTask.Start();
             return stopAcqTask;
-
         }
-
 
         public Task<bool> WriteIO(DigitalOutput Output_port_number)
         {
@@ -1425,7 +1380,6 @@ namespace APIX_Winform_Demo
                     succeeded = true;
                 }
                 return succeeded;
-
             });
             SaveParaTask.Start();
             return SaveParaTask;
@@ -1439,7 +1393,7 @@ namespace APIX_Winform_Demo
             intensityImage.Dispose(); intensityImage = new Mat();
             laserlinethicknessImage.Dispose(); laserlinethicknessImage = new Mat();
 
-            //test for pointcloud data management list 
+            //test for pointcloud data management list
             point3Fs.Clear();
             metaDataCollectionList.Clear();
         }
@@ -1452,9 +1406,7 @@ namespace APIX_Winform_Demo
             }
         }
 
-
-        #endregion
-
+        #endregion functions
     }
 
     public struct ROI
@@ -1476,12 +1428,12 @@ namespace APIX_Winform_Demo
         }
     }
 
-
     public struct ExternalTriggerParameter
     {
         public int TriggerDivider;
         public int TriggerDelay;
         public TriggerEdgeMode TriggerEdgeMode;
+
         public ExternalTriggerParameter(int _mTriggerDivider = 1, int _mTriggerDelay = 0, TriggerEdgeMode _mTriggerEdgeMode = TriggerEdgeMode.RisingEdge)
         {
             TriggerDivider = _mTriggerDivider;
@@ -1494,6 +1446,7 @@ namespace APIX_Winform_Demo
     {
         public int CurrentScanRate;
         public int isTriggerOverflow;
+
         public CurrentScanRateStruct(int _CurrentScanRate = 1000, int _isTriggerOverflow = 0)
         {
             CurrentScanRate = _CurrentScanRate;
@@ -1505,6 +1458,7 @@ namespace APIX_Winform_Demo
     {
         public float VerticalResolution;
         public float LatervalResolution;
+
         public ZmapResolution(float _VerticalResolution = 0.001f, float _LatervalResolution = 0.006f)
         {
             VerticalResolution = _VerticalResolution;
@@ -1526,6 +1480,7 @@ namespace APIX_Winform_Demo
         public uint imagewidth;
         public ImageDataType imagetype;
         public List<MetaDataCollection> MetaDataList;
+
         public SRImageHandlerArgument()
         {
             liveimage = null;
@@ -1538,7 +1493,6 @@ namespace APIX_Winform_Demo
             imagetype = ImageDataType.Invalid;
             MetaDataList = null;
         }
-
     }
 
     /// <summary>
@@ -1600,7 +1554,5 @@ namespace APIX_Winform_Demo
             this._exposureTime = exposure;
             this._gain = gain;
         }
-
     }
-
 }

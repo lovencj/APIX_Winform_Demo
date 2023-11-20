@@ -183,7 +183,7 @@ namespace APIX_Winform_Demo
             this.btn_ChooseSaveFilePath.TabIndex = 8;
             this.btn_ChooseSaveFilePath.Text = "..";
             this.btn_ChooseSaveFilePath.UseVisualStyleBackColor = true;
-            this.btn_ChooseSaveFilePath.Click += new System.EventHandler(this.btn_ChooseSaveFilePath_Click);
+            this.btn_ChooseSaveFilePath.Click += new System.EventHandler(this.Btn_ChooseSaveFilePath_Click);
             // 
             // tbx_SaveImageFilePath
             // 
@@ -215,7 +215,7 @@ namespace APIX_Winform_Demo
             this.ckb_XEnahancement.TabIndex = 0;
             this.ckb_XEnahancement.Text = "Enable X Enhancement";
             this.ckb_XEnahancement.UseVisualStyleBackColor = true;
-            this.ckb_XEnahancement.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
+            this.ckb_XEnahancement.CheckedChanged += new System.EventHandler(this.Ckb_EnableHorizentalBinning_CheckedChanged);
             // 
             // ckb_EnableVerticalBinning
             // 
@@ -226,7 +226,7 @@ namespace APIX_Winform_Demo
             this.ckb_EnableVerticalBinning.TabIndex = 0;
             this.ckb_EnableVerticalBinning.Text = "Enable Vertical Binning";
             this.ckb_EnableVerticalBinning.UseVisualStyleBackColor = true;
-            this.ckb_EnableVerticalBinning.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
+            this.ckb_EnableVerticalBinning.CheckedChanged += new System.EventHandler(this.Ckb_EnableHorizentalBinning_CheckedChanged);
             // 
             // ckb_EnableHorizentalBinning
             // 
@@ -237,7 +237,7 @@ namespace APIX_Winform_Demo
             this.ckb_EnableHorizentalBinning.TabIndex = 0;
             this.ckb_EnableHorizentalBinning.Text = "Enable Horizental Binning";
             this.ckb_EnableHorizentalBinning.UseVisualStyleBackColor = true;
-            this.ckb_EnableHorizentalBinning.CheckedChanged += new System.EventHandler(this.ckb_EnableHorizentalBinning_CheckedChanged);
+            this.ckb_EnableHorizentalBinning.CheckedChanged += new System.EventHandler(this.Ckb_EnableHorizentalBinning_CheckedChanged);
             // 
             // gbx_SensorInfo
             // 
@@ -354,7 +354,7 @@ namespace APIX_Winform_Demo
             this.comboBox_ImageType.Name = "comboBox_ImageType";
             this.comboBox_ImageType.Size = new System.Drawing.Size(301, 20);
             this.comboBox_ImageType.TabIndex = 1;
-            this.comboBox_ImageType.SelectedValueChanged += new System.EventHandler(this.comboBox_ImageType_SelectedValueChanged);
+            this.comboBox_ImageType.SelectedValueChanged += new System.EventHandler(this.ComboBox_ImageType_SelectedValueChanged);
             // 
             // btn_SimulateTrigger
             // 
@@ -366,7 +366,7 @@ namespace APIX_Winform_Demo
             this.btn_SimulateTrigger.TabIndex = 0;
             this.btn_SimulateTrigger.Text = "Simulate Start Trigger(Outpu2-->Input1)";
             this.btn_SimulateTrigger.UseVisualStyleBackColor = true;
-            this.btn_SimulateTrigger.Click += new System.EventHandler(this.btn_SimulateTrigger_Click);
+            this.btn_SimulateTrigger.Click += new System.EventHandler(this.Btn_SimulateTrigger_Click);
             // 
             // btn_StartAcquisition
             // 
@@ -378,7 +378,7 @@ namespace APIX_Winform_Demo
             this.btn_StartAcquisition.TabIndex = 0;
             this.btn_StartAcquisition.Text = "Start Acquisition";
             this.btn_StartAcquisition.UseVisualStyleBackColor = true;
-            this.btn_StartAcquisition.Click += new System.EventHandler(this.btn_StartAcquisition_Click);
+            this.btn_StartAcquisition.Click += new System.EventHandler(this.Btn_StartAcquisition_Click);
             // 
             // gbx_SensorPar
             // 
@@ -410,7 +410,7 @@ namespace APIX_Winform_Demo
             this.btn_LoadConfig.TabIndex = 7;
             this.btn_LoadConfig.Text = "..";
             this.btn_LoadConfig.UseVisualStyleBackColor = true;
-            this.btn_LoadConfig.Click += new System.EventHandler(this.btn_LoadConfig_Click);
+            this.btn_LoadConfig.Click += new System.EventHandler(this.Btn_LoadConfig_Click);
             // 
             // btn_SaveFilePath
             // 
@@ -420,7 +420,7 @@ namespace APIX_Winform_Demo
             this.btn_SaveFilePath.TabIndex = 4;
             this.btn_SaveFilePath.Text = "Save Configration File";
             this.btn_SaveFilePath.UseVisualStyleBackColor = true;
-            this.btn_SaveFilePath.Click += new System.EventHandler(this.btn_SaveConfigrationFile_Click);
+            this.btn_SaveFilePath.Click += new System.EventHandler(this.Btn_SaveConfigrationFile_Click);
             // 
             // tbx_ConfigFilePath
             // 
@@ -471,7 +471,7 @@ namespace APIX_Winform_Demo
             this.tBx_PacketTimeout.Name = "tBx_PacketTimeout";
             this.tBx_PacketTimeout.Size = new System.Drawing.Size(160, 21);
             this.tBx_PacketTimeout.TabIndex = 1;
-            this.tBx_PacketTimeout.TextChanged += new System.EventHandler(this.tBx_PacketTimeout_TextChanged);
+            this.tBx_PacketTimeout.TextChanged += new System.EventHandler(this.TBx_PacketTimeout_TextChanged);
             // 
             // tBx_PacketSize
             // 
@@ -479,7 +479,7 @@ namespace APIX_Winform_Demo
             this.tBx_PacketSize.Name = "tBx_PacketSize";
             this.tBx_PacketSize.Size = new System.Drawing.Size(253, 21);
             this.tBx_PacketSize.TabIndex = 1;
-            this.tBx_PacketSize.TextChanged += new System.EventHandler(this.tBx_PacketSize_TextChanged);
+            this.tBx_PacketSize.TextChanged += new System.EventHandler(this.TBx_PacketSize_TextChanged);
             // 
             // tbx_NumberOfProfile
             // 
@@ -487,7 +487,7 @@ namespace APIX_Winform_Demo
             this.tbx_NumberOfProfile.Name = "tbx_NumberOfProfile";
             this.tbx_NumberOfProfile.Size = new System.Drawing.Size(317, 21);
             this.tbx_NumberOfProfile.TabIndex = 1;
-            this.tbx_NumberOfProfile.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.tbx_NumberOfProfile.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
             // 
             // label1
             // 
@@ -520,7 +520,7 @@ namespace APIX_Winform_Demo
             this.btn_InitialSensor.TabIndex = 0;
             this.btn_InitialSensor.Text = "Initial sensor";
             this.btn_InitialSensor.UseVisualStyleBackColor = true;
-            this.btn_InitialSensor.Click += new System.EventHandler(this.btn_InitialSensor_Click);
+            this.btn_InitialSensor.Click += new System.EventHandler(this.Btn_InitialSensor_Click);
             // 
             // vScrollBar1
             // 

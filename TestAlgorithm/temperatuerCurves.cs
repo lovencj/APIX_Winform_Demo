@@ -23,7 +23,7 @@ namespace APIX_Winform_Demo.TestAlgorithm
             return dst;
         }
 
-        public List<float> SegementData(SRImageHandlerArgument SourceData)
+        public List<float> DataMeasurement(SRImageHandlerArgument SourceData)
         {
             List<float> result = new List<float>();
             var SourceDataRow = SourceData.pointcloud[0];

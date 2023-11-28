@@ -78,7 +78,6 @@ namespace APIX_Winform_Demo
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).BeginInit();
-            this.tabPage2.SuspendLayout();
             this.gbx_SaveImage.SuspendLayout();
             this.gbx_binning.SuspendLayout();
             this.gbx_SensorInfo.SuspendLayout();
@@ -397,7 +396,7 @@ namespace APIX_Winform_Demo
             this.gbx_SensorPar.Controls.Add(this.label1);
             this.gbx_SensorPar.Location = new System.Drawing.Point(4, 93);
             this.gbx_SensorPar.Name = "gbx_SensorPar";
-            this.gbx_SensorPar.Size = new System.Drawing.Size(330, 218);
+            this.gbx_SensorPar.Size = new System.Drawing.Size(330, 207);
             this.gbx_SensorPar.TabIndex = 2;
             this.gbx_SensorPar.TabStop = false;
             this.gbx_SensorPar.Text = "Sensor Parameters";
@@ -546,7 +545,6 @@ namespace APIX_Winform_Demo
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.cv_imageBox1)).EndInit();
-            this.tabPage2.ResumeLayout(false);
             this.gbx_SaveImage.ResumeLayout(false);
             this.gbx_SaveImage.PerformLayout();
             this.gbx_binning.ResumeLayout(false);

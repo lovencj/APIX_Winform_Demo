@@ -561,11 +561,22 @@ namespace APIX_Winform_Demo
             }
             set
             {
-                _NumberOfProfileToCapture = value;
                 if (_isSensorConnected)
                 {
-                    sensor.SetNumberOfProfilesToCapture(value);
+                    try
+                    {
+                        sensor.SetNumberOfProfilesToCapture(value);
+
+                    }
+                    catch (Exception ce)
+                    {
+                        log.Error("Set number of profile failed, the Maximum number of profile should less than 65535(2^16).\n" + ce.Message);
+                        value = 2 ^ 16 - 1;
+                        sensor.SetNumberOfProfilesToCapture(value);
+                    }
                 }
+                _NumberOfProfileToCapture = value;
+
             }
         }
 
@@ -1182,11 +1193,14 @@ namespace APIX_Winform_Demo
                     sensor.SetSmartXtractPreset(value);
                     if (value != string.Empty)
                     {
-                        sensor.IsSmartXtractEnabled(true);
+                        sensor.EnableSmartXtract(true);
                     }
                     else
                     {
-                        sensor.IsSmartXtractEnabled(false);
+                        if (sensor.IsSmartXtractEnabled())
+                        { 
+                            sensor.EnableSmartXtract(false); 
+                        }
                     }
                 }
                 _SmartXTract = value;
@@ -1241,7 +1255,16 @@ namespace APIX_Winform_Demo
             {
                 if (_isSensorConnected)
                 {
-                    sensor.SetSmartXactMode(value);
+                    try
+                    {
+                        sensor.SetSmartXactMode(value);
+
+                    }
+                    catch (Exception ce)
+                    {
+                        log.Error("The sensor can't support the SmartXact feature, Error message as below:\n" + ce);
+                        value = SmartXactModeType.Default;
+                    }
                 }
                 _SmartXact = value;
             }
@@ -1327,6 +1350,7 @@ namespace APIX_Winform_Demo
                     if (_isSensorConnected)
                     {
                         sensor.StopAcquisition();
+                        Clearbuffer();
                         stopAcqusition = true;
                     }
                     else

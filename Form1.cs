@@ -138,28 +138,28 @@ namespace APIX_Winform_Demo
                         case ImageDataType.PointCloud:
                             cv_imageBox1.Image = SRimageHandlerArgument.intensity_image;
                             //temperatuerCurvesTool.RowToArrD(SRimageHandlerArgument.pointcloud[0], (int)SRimageHandlerArgument.imageheight);
-                            var res = temperatuerCurvesTool.SegementData(SRimageHandlerArgument);
+                            //var res = temperatuerCurvesTool.DataMeasurement(SRimageHandlerArgument);
                             var temp = tempSensor.SensorTemp2rd;
                             if (ckb_EnableSaveFiles.Checked)
                             {
                                 SRimageHandlerArgument.intensity_image.Save(tbx_SaveImageFilePath.Text + "\\ProfileIntensityImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
                                 SRimageHandlerArgument.intensity_image.Save(tbx_SaveImageFilePath.Text + "\\ProfileLaserLineThicknessImage" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".png");
                                 sensorHelper.SaveToPly(tbx_SaveImageFilePath.Text + "\\PointCloud" + DateTime.Now.ToString("MMddHH-mm-ss-fff") + ".ply", SRimageHandlerArgument.pointcloud);
-                                string resultString = string.Empty;
-                                foreach (var item in temp)
-                                {
-                                    resultString += item.Temperature.ToString("0.000") + ",";
-                                }
-                                foreach (var item in res)
-                                {
-                                    resultString += item.ToString() + ",";
-                                }
+                                //string resultString = string.Empty;
+                                //foreach (var item in temp)
+                                //{
+                                //    resultString += item.Temperature.ToString("0.000") + ",";
+                                //}
+                                //foreach (var item in res)
+                                //{
+                                //    resultString += item.ToString() + ",";
+                                //}
 
-                                using (StreamWriter writer = new StreamWriter(tbx_SaveImageFilePath.Text + "\\" + "SensorTemperature" + ".csv", true, System.Text.Encoding.GetEncoding("GB18030")))
-                                {
-                                    writer.WriteLine(DateTime.Now.ToString("MMddHH-mm-ss-fff") + "," + resultString);
-                                    writer.Close();
-                                }
+                                //using (StreamWriter writer = new StreamWriter(tbx_SaveImageFilePath.Text + "\\" + "SensorTemperature" + ".csv", true, System.Text.Encoding.GetEncoding("GB18030")))
+                                //{
+                                //    writer.WriteLine(DateTime.Now.ToString("MMddHH-mm-ss-fff") + "," + resultString);
+                                //    writer.Close();
+                                //}
                             }
 
                             break;
@@ -185,8 +185,8 @@ namespace APIX_Winform_Demo
             })).Start();
             GC.Collect();
 
-            Thread.Sleep(1000 * 10);
-            Sensor1.WriteIO(DigitalOutput.Channel2);
+            //Thread.Sleep(500 * 1);
+            //Sensor1.WriteIO(DigitalOutput.Channel2);
         }
 
         private void OnSensorMessgae(MessageType aMsgType, SubMessageType aSubMsgType, int aMsgData, string aMsg)
@@ -205,21 +205,21 @@ namespace APIX_Winform_Demo
                 log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
                 HiPerfTimer.Start();
                 Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-                Sensor1.NumberOfProfileToCapture = 10;
-                Sensor1.PackSize = 10;
+                Sensor1.NumberOfProfileToCapture = 5000;
+                Sensor1.PackSize = 1000;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
-                Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
+                Sensor1.SensorDataTriggerMode = DataTriggerMode.External;
                 Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
                 Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0, TriggerEdgeMode.RisingEdge);
-                Sensor1.SensorInternalTriggerFreq = 1000;
+                Sensor1.SensorInternalTriggerFreq = 10000;
                 Sensor1.StartTriggerEnable = Enabled;
                 Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
                 Sensor1.TiltAnglePitch = 0f;
                 Sensor1.TiltAngleYaw = 0f;
-                Sensor1.TransportResolution = 0.1f;
+                Sensor1.TransportResolution = 0.012f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.006f);
-                Sensor1.SmartXact = SmartXactModeType.Metrology; //enable Metrology Mode
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
+                Sensor1.SmartXact = SmartXactModeType.Default; //enable Metrology Mode
                 Sensor1.XEhancement = true;//enable XEnhancement
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 //{
@@ -231,11 +231,12 @@ namespace APIX_Winform_Demo
                 {
                     //exposureGains.Add(new ExposureGain(4d, 3));
                    // new ExposureGain(10d, 2),
-                    new ExposureGain(200d, 3),
+                    new ExposureGain(8d, 3),
+new ExposureGain(60d, 3),
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 1920, 414, 382);
+                Sensor1.SensorROI = new ROI(0, 4096, 300, 76);
 
                 HiPerfTimer.Stop();
                 log.Info($"{Sensor1.SensorModel}");

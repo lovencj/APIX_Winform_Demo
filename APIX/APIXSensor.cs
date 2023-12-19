@@ -891,7 +891,8 @@ namespace APIX_Winform_Demo
                     for (int i = 0; i < exposureCounter; i++)
                     {
                         sensor.GetExposureDuration(i, out double _expo);
-                        _exposuresAndgains.Add(new ExposureGain(_expo, gainValue));
+                        int laserlinebrightnessthreshold=sensor.Get3DLaserLineBrightnessThreshold(i);
+                        _exposuresAndgains.Add(new ExposureGain(_expo, gainValue, laserlinebrightnessthreshold));
                     }
                 }
                 else
@@ -914,6 +915,7 @@ namespace APIX_Winform_Demo
                         if (sensor.MinExposureTimeInMicroSeconds < value[i].ExposureTime && sensor.MaxExposureTimeInMicroSeconds > value[i].ExposureTime)
                         {
                             sensor.SetExposureDuration(i, value[i].ExposureTime);
+                            sensor.Set3DLaserLineBrightnessThreshold(i, value[i].LaserLineBrightnessThreshold);
                             if (value[i].Gain > 0)
                             {
                                 sensor.SetGain(true, value[i].Gain);
@@ -1568,15 +1570,38 @@ namespace APIX_Winform_Demo
             }
         }
 
+        private int _laserLineBrightnessThreshold;
+
+        public int LaserLineBrightnessThreshold
+        {
+            get
+            {
+                return _laserLineBrightnessThreshold;
+            }
+            set
+            {
+                if (value>=0&& value<=255)
+                {
+                    _laserLineBrightnessThreshold=value;
+                }
+                else
+                {
+                    _laserLineBrightnessThreshold=40;
+                }
+            }
+        }
+
+
         /// <summary>
         /// Initial the exposure and gain value
         /// </summary>
         /// <param name="exposure">exposure time, value from 0 to 1000</param>
         /// <param name="gain"></param>
-        public ExposureGain(double exposure = 10, int gain = 0)
+        public ExposureGain(double exposure = 10, int gain = 0, int laserlineBrightness=40)
         {
             this._exposureTime = exposure;
             this._gain = gain;
+            this._laserLineBrightnessThreshold = laserlineBrightness;
         }
     }
 }

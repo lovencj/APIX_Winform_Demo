@@ -9,6 +9,7 @@ using SmartRay;
 using SmartRay.Api;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -81,6 +82,7 @@ namespace APIX_Winform_Demo
             this._ExternalTriggerParameter = new ExternalTriggerParameter();
             this._currentScanRate = new CurrentScanRateStruct();
             this._distancePreCircle = 0.001d;
+            //this._smartXtract = new SmartXtract();
         }
 
         #region callback functions
@@ -762,7 +764,7 @@ namespace APIX_Winform_Demo
                         catch (Exception ce)
                         {
                             log.Error("Set the ROI failed, the error message as below:\n" + ce.Message);
-                            throw;
+                            //throw;
                         }
                     }
                 }
@@ -891,7 +893,7 @@ namespace APIX_Winform_Demo
                     for (int i = 0; i < exposureCounter; i++)
                     {
                         sensor.GetExposureDuration(i, out double _expo);
-                        int laserlinebrightnessthreshold=sensor.Get3DLaserLineBrightnessThreshold(i);
+                        int laserlinebrightnessthreshold = sensor.Get3DLaserLineBrightnessThreshold(i);
                         _exposuresAndgains.Add(new ExposureGain(_expo, gainValue, laserlinebrightnessthreshold));
                     }
                 }
@@ -1180,34 +1182,67 @@ namespace APIX_Winform_Demo
             }
         }
 
-        private string _SmartXTract;
+        //private string _SmartXTract;
 
-        public string SmartXTract
+        //public string SmartXTract
+        //{
+        //    get
+        //    {
+        //        return _SmartXTract;
+        //    }
+        //    set
+        //    {
+        //        if (_isSensorConnected)
+        //        {
+        //            sensor.SetSmartXtractPreset(value);
+        //            if (value != string.Empty)
+        //            {
+        //                sensor.EnableSmartXtract(true);
+        //            }
+        //            else
+        //            {
+        //                if (sensor.IsSmartXtractEnabled())
+        //                {
+        //                    sensor.EnableSmartXtract(false);
+        //                }
+        //            }
+        //        }
+        //        _SmartXTract = value;
+        //    }
+        //}
+
+        private SmartXtract _smartXtractFeature;
+
+        public SmartXtract SmartXtractFeature
         {
             get
             {
-                return _SmartXTract;
+                if (_isSensorConnected)
+                {
+                    _smartXtractFeature.isEnable = sensor.IsSmartXtractEnabled();
+                    _smartXtractFeature.SmartXTractFilePath = sensor.GetSmartXtractPreset();
+                }
+                return _smartXtractFeature;
             }
             set
             {
                 if (_isSensorConnected)
                 {
-                    sensor.SetSmartXtractPreset(value);
-                    if (value != string.Empty)
+                    if (value.SmartXTractFilePath != string.Empty)
                     {
-                        sensor.EnableSmartXtract(true);
+                        sensor.EnableSmartXtract(value.isEnable);
+                        sensor.SetSmartXtractPreset(value.SmartXTractFilePath);
+
                     }
                     else
                     {
-                        if (sensor.IsSmartXtractEnabled())
-                        { 
-                            sensor.EnableSmartXtract(false); 
-                        }
+                        log.Warn("SmartXTract preset file not existing");
                     }
                 }
-                _SmartXTract = value;
+                _smartXtractFeature = value;
             }
         }
+
 
         private string _SmartXPress;
 
@@ -1580,13 +1615,13 @@ namespace APIX_Winform_Demo
             }
             set
             {
-                if (value>=0&& value<=255)
+                if (value >= 0 && value <= 255)
                 {
-                    _laserLineBrightnessThreshold=value;
+                    _laserLineBrightnessThreshold = value;
                 }
                 else
                 {
-                    _laserLineBrightnessThreshold=40;
+                    _laserLineBrightnessThreshold = 40;
                 }
             }
         }
@@ -1597,11 +1632,60 @@ namespace APIX_Winform_Demo
         /// </summary>
         /// <param name="exposure">exposure time, value from 0 to 1000</param>
         /// <param name="gain"></param>
-        public ExposureGain(double exposure = 10, int gain = 0, int laserlineBrightness=40)
+        public ExposureGain(double exposure = 10, int gain = 0, int laserlineBrightness = 40)
         {
             this._exposureTime = exposure;
             this._gain = gain;
             this._laserLineBrightnessThreshold = laserlineBrightness;
         }
     }
+
+    public struct SmartXtract
+    {
+        private bool _isEnable;
+        public bool isEnable
+        {
+            get
+            {
+                return _isEnable;
+            }
+            set
+            {
+                _isEnable = value;
+            }
+        }
+
+        private string _SmartXtractFilePath;
+
+        public string SmartXTractFilePath
+        {
+            get
+            {
+                return _SmartXtractFilePath;
+            }
+            set
+            {
+                _SmartXtractFilePath = value;
+            }
+        }
+
+
+        public SmartXtract(bool isEnable = false, string smartXtractFilePath = "")
+        {
+            _SmartXtractFilePath = string.Empty;
+            this._isEnable = isEnable;
+            if (smartXtractFilePath != string.Empty)
+            {
+                bool fileExit = File.Exists(smartXtractFilePath);
+                if (fileExit)
+                {
+                    this._SmartXtractFilePath = smartXtractFilePath;
+                }
+                else { this._SmartXtractFilePath = string.Empty; }
+            }
+
+        }
+
+    }
+
 }

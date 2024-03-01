@@ -205,22 +205,23 @@ namespace APIX_Winform_Demo
                 log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
                 HiPerfTimer.Start();
                 Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-                Sensor1.NumberOfProfileToCapture = 5000;
+                Sensor1.NumberOfProfileToCapture = 1000;
                 Sensor1.PackSize = 1000;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
                 Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
                 Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
                 Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0, TriggerEdgeMode.RisingEdge);
-                Sensor1.SensorInternalTriggerFreq = 10000;
-                Sensor1.StartTriggerEnable = Enabled;
+                Sensor1.SensorInternalTriggerFreq = 8000;
+                Sensor1.StartTriggerEnable = true;
                 Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
                 Sensor1.TiltAnglePitch = 0f;
-                Sensor1.TiltAngleYaw = -12f;
-                Sensor1.TransportResolution = 0.012f;
+                Sensor1.TiltAngleYaw = 0f;
+                Sensor1.TransportResolution = 0.019f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.012f);
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.019f);
                 Sensor1.SmartXact = SmartXactModeType.Default; //enable Metrology Mode
                 Sensor1.XEhancement = true;//enable XEnhancement
+                //Sensor1.SmartXtractFeature = new SmartXtract(true, @"C:\SmartRay\SmartRay DevKit\SR_API\smartxtract\Glues.sxt");
                 //Sensor1.SmartXTract = @"C:\SmartRay\SmartRay DevKit\SR_API\smartxtract\Glues.sxt";
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
                 //{
@@ -232,12 +233,12 @@ namespace APIX_Winform_Demo
                 {
                     //exposureGains.Add(new ExposureGain(4d, 3));
                    // new ExposureGain(10d, 2),
-                    new ExposureGain(8d, 3,40),
+                    new ExposureGain(16d, 3,40),
                     //new ExposureGain(20d, 3,32),
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 4096, 628, 56);
+                Sensor1.SensorROI = new ROI(0, 1920, 0, 1200);
 
                 HiPerfTimer.Stop();
                 log.Info($"{Sensor1.SensorModel}");
@@ -313,7 +314,7 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor Maximun scan rate:" + Sensor1.MaximumScanRate + ", Distance Pre circle:" + Sensor1.DistancePreCircle + ", Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Maximun running speed is: MaximumScanRate x DistancePreCircle x TriggerDivider=" + Sensor1.MaximumScanRate * Sensor1.DistancePreCircle * Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Zmap Resolution: Vertical Resolution:" + Sensor1.ZmapResolution.VerticalResolution.ToString() + ", Laterval Resolution:" + Sensor1.ZmapResolution.LatervalResolution);
-                log.Info("Sensor SmartXTract feature:" + Sensor1.SmartXTract);
+                log.Info("Sensor SmartXTract feature:" + Sensor1.SmartXtractFeature.SmartXTractFilePath);
                 await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel != null)
                 {

@@ -1341,7 +1341,7 @@ namespace APIX_Winform_Demo
                     else
                     {
                         sensor.SetPrefilterLaserLineThickness(3, 63);
-                        sensor.SetPrefilterDefault(false, 3);
+                        sensor.SetPrefilterDefault();
                     }
                 }
                 _SmartXTractLaserlineThicknessFilter = value;

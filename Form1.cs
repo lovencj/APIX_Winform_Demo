@@ -221,6 +221,9 @@ namespace APIX_Winform_Demo
                 Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.019f);
                 Sensor1.SmartXact = SmartXactModeType.Default; //enable Metrology Mode
                 Sensor1.XEhancement = true;//enable XEnhancement
+                Sensor1.SmartXTractLaserLineThicknessFilter=new SmartXTract_LaserlineThicknessFilter(false,3,16);
+                Sensor1.SmartXTract_3DDataGenerationMode = DataGeneration3DModeType.TopEdgeOfLaserLine;
+                Sensor1.SmartXTract_ReflectionFilter=ReflectionParameter.Default_filter;
                 //Sensor1.SmartXtractFeature = new SmartXtract(true, @"C:\SmartRay\SmartRay DevKit\SR_API\smartxtract\Glues.sxt");
                 //Sensor1.SmartXTract = @"C:\SmartRay\SmartRay DevKit\SR_API\smartxtract\Glues.sxt";
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
@@ -314,7 +317,10 @@ namespace APIX_Winform_Demo
                 log.Info("Sensor Maximun scan rate:" + Sensor1.MaximumScanRate + ", Distance Pre circle:" + Sensor1.DistancePreCircle + ", Trigger divider:" + Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Maximun running speed is: MaximumScanRate x DistancePreCircle x TriggerDivider=" + Sensor1.MaximumScanRate * Sensor1.DistancePreCircle * Sensor1.externalTriggerParameter.TriggerDivider);
                 log.Info("Sensor Zmap Resolution: Vertical Resolution:" + Sensor1.ZmapResolution.VerticalResolution.ToString() + ", Laterval Resolution:" + Sensor1.ZmapResolution.LatervalResolution);
-                log.Info("Sensor SmartXTract feature:" + Sensor1.SmartXtractFeature.SmartXTractFilePath);
+                log.Info("Sensor SmartXTract feature:" + Sensor1.SmartXTractFeatureAdditionalFilter.SmartXTractFilePath);
+                log.Info("Sensor SmartXTract LaserLineThicknessFilter feature:" + Sensor1.SmartXTractLaserLineThicknessFilter);
+                log.Info("Sensor SmartXTract 3DDataGenerationMode feature:" + Sensor1.SmartXTract_3DDataGenerationMode);
+                log.Info("Sensor SmartXTract ReflectionFilter feature:" + Sensor1.SmartXTract_ReflectionFilter);
                 await Sensor1.StartAcquisition();
                 if (Sensor1.SensorModel != null)
                 {

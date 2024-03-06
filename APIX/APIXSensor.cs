@@ -82,6 +82,11 @@ namespace APIX_Winform_Demo
             this._ExternalTriggerParameter = new ExternalTriggerParameter();
             this._currentScanRate = new CurrentScanRateStruct();
             this._distancePreCircle = 0.001d;
+            this._smartXtractFeatureAdditionalFilter=new SmartXtractAdditionalFilter(false,string.Empty);
+            this._smartXtract_ReflectionFilter = ReflectionParameter.Default_filter;
+            this._SmartXTractLaserlineThicknessFilter = new SmartXTract_LaserlineThicknessFilter(false);
+            this._SmartXTract_3DDataGenerationMode = DataGeneration3DModeType.Default;
+            
             //this._smartXtract = new SmartXtract();
         }
 
@@ -1211,18 +1216,18 @@ namespace APIX_Winform_Demo
         //    }
         //}
 
-        private SmartXtract _smartXtractFeature;
+        private SmartXtractAdditionalFilter _smartXtractFeatureAdditionalFilter;
 
-        public SmartXtract SmartXtractFeature
+        public SmartXtractAdditionalFilter SmartXTractFeatureAdditionalFilter
         {
             get
             {
                 if (_isSensorConnected)
                 {
-                    _smartXtractFeature.isEnable = sensor.IsSmartXtractEnabled();
-                    _smartXtractFeature.SmartXTractFilePath = sensor.GetSmartXtractPreset();
+                    _smartXtractFeatureAdditionalFilter.isEnable = sensor.IsSmartXtractEnabled();
+                    _smartXtractFeatureAdditionalFilter.SmartXTractFilePath = sensor.GetSmartXtractPreset();
                 }
-                return _smartXtractFeature;
+                return _smartXtractFeatureAdditionalFilter;
             }
             set
             {
@@ -1239,9 +1244,110 @@ namespace APIX_Winform_Demo
                         log.Warn("SmartXTract preset file not existing");
                     }
                 }
-                _smartXtractFeature = value;
+                _smartXtractFeatureAdditionalFilter = value;
             }
         }
+
+        private ReflectionParameter _smartXtract_ReflectionFilter;
+
+        public ReflectionParameter SmartXTract_ReflectionFilter
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.GetReflectionFilter(out bool aisEable, out int aoutalogrithm, out int aOutPreset);
+                    if (aisEable)
+                    {
+                        _smartXtract_ReflectionFilter = (ReflectionParameter)aoutalogrithm;
+                    }
+                    else
+                    {
+                        _smartXtract_ReflectionFilter = ReflectionParameter.Default_filter;
+
+                    }
+                }
+                return _smartXtract_ReflectionFilter;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    if (value != ReflectionParameter.Default_filter)
+                    {
+                        sensor.SetReflectionFilter(true, (int)value, -1);
+                    }
+                    else
+                    {
+                        sensor.SetReflectionFilter(false, (int)0, -1);
+                    }
+                }
+                _smartXtract_ReflectionFilter = value;
+            }
+        }
+
+        private DataGeneration3DModeType _SmartXTract_3DDataGenerationMode;
+
+        public DataGeneration3DModeType SmartXTract_3DDataGenerationMode
+        {
+            get
+            {
+                if (_isSensorConnected)
+                {
+                    _SmartXTract_3DDataGenerationMode = sensor.GetSmartXtract3DDataGenerationMode();
+                }
+                return _SmartXTract_3DDataGenerationMode;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    sensor.SetSmartXtract3DDataGenerationMode(value);
+                }
+                _SmartXTract_3DDataGenerationMode = value;
+            }
+        }
+
+        private SmartXTract_LaserlineThicknessFilter _SmartXTractLaserlineThicknessFilter;
+
+        public SmartXTract_LaserlineThicknessFilter SmartXTractLaserLineThicknessFilter
+        {
+            get
+            {
+                if (!_isSensorConnected)
+                {
+                    sensor.GetPrefilterLaserLineThickness(out ushort aOutMin, out ushort aOutMax);
+                    if (aOutMin == 3 && aOutMax == 63)
+                    {
+                        _SmartXTractLaserlineThicknessFilter.isEnable = false;
+                    }
+                    else
+                    {
+                        _SmartXTractLaserlineThicknessFilter.isEnable = true;
+                    }
+                    _SmartXTractLaserlineThicknessFilter.minValue = aOutMin;
+                    _SmartXTractLaserlineThicknessFilter.maxValue = aOutMax;
+                }
+                return _SmartXTractLaserlineThicknessFilter;
+            }
+            set
+            {
+                if (_isSensorConnected)
+                {
+                    if (value.isEnable)
+                    {
+                        sensor.SetPrefilterLaserLineThickness(value.minValue, value.maxValue);
+                    }
+                    else
+                    {
+                        sensor.SetPrefilterLaserLineThickness(3, 63);
+                        sensor.SetPrefilterDefault(false, 3);
+                    }
+                }
+                _SmartXTractLaserlineThicknessFilter = value;
+            }
+        }
+
 
 
         private string _SmartXPress;
@@ -1640,7 +1746,53 @@ namespace APIX_Winform_Demo
         }
     }
 
-    public struct SmartXtract
+    public struct SmartXTract_LaserlineThicknessFilter
+    {
+
+        private bool _isEnable;
+
+        public bool isEnable
+        {
+            get { return _isEnable; }
+            set { _isEnable = value; }
+        }
+        private ushort _minValue;
+
+        public ushort minValue
+        {
+            get { return _minValue; }
+            set
+            {
+                if (value < 3)
+                {
+                    value = 3;
+                }
+                _minValue = value;
+            }
+        }
+
+        private ushort _maxValue;
+
+        public ushort maxValue
+        {
+            get { return _maxValue; }
+            set
+            {
+                if (value > 255) value = 255;
+                _maxValue = value;
+            }
+        }
+        public SmartXTract_LaserlineThicknessFilter(bool isEnable = false, ushort minValue = 3, ushort maxValue = 63)
+        {
+            this._isEnable = isEnable;
+            this._minValue = minValue;
+            this._maxValue = maxValue;
+
+        }
+
+    }
+
+    public struct SmartXtractAdditionalFilter
     {
         private bool _isEnable;
         public bool isEnable
@@ -1670,7 +1822,7 @@ namespace APIX_Winform_Demo
         }
 
 
-        public SmartXtract(bool isEnable = false, string smartXtractFilePath = "")
+        public SmartXtractAdditionalFilter(bool isEnable = false, string smartXtractFilePath = "")
         {
             _SmartXtractFilePath = string.Empty;
             this._isEnable = isEnable;
@@ -1686,6 +1838,13 @@ namespace APIX_Winform_Demo
 
         }
 
+    }
+
+    public enum ReflectionParameter
+    {
+        Default_filter = 2, //disabled, means peak method
+        Filter_reflections_above_laser_line = 0, //Filter reflections Above Laser Line
+        Filter_reflections_below_laser_line = 1 //Filter reflections Below Laser Line
     }
 
 }

@@ -205,25 +205,27 @@ namespace APIX_Winform_Demo
                 log.Info("Connect sensor taken:" + HiPerfTimer.Duration + "ms");
                 HiPerfTimer.Start();
                 Sensor1.AcquisitionType = ImageAcquisitionType.ZMapIntensityLaserLineThickness;
-                Sensor1.NumberOfProfileToCapture = 1000;
-                Sensor1.PackSize = 1000;
+                Sensor1.NumberOfProfileToCapture = 800;
+                Sensor1.PackSize = 10;
                 Sensor1.PacketTimeout = new TimeSpan(0, 0, 0, 0, 0);
-                Sensor1.SensorDataTriggerMode = DataTriggerMode.Internal;
+                Sensor1.SensorDataTriggerMode = DataTriggerMode.External;
                 Sensor1.DataTriggerSource = DataTriggerSource.QuadEncoder;
-                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(12, 0, TriggerEdgeMode.RisingEdge);
+                Sensor1.externalTriggerParameter = new ExternalTriggerParameter(50, 0, TriggerEdgeMode.Both);
                 Sensor1.SensorInternalTriggerFreq = 8000;
-                Sensor1.StartTriggerEnable = true;
+                Sensor1.StartTriggerEnable = false;
                 Sensor1.AcquisitionMode = AcquisitionMode.RepeatSnapshot;
                 Sensor1.TiltAnglePitch = 0f;
                 Sensor1.TiltAngleYaw = 0f;
-                Sensor1.TransportResolution = 0.019f;
+                Sensor1.TransportResolution = 0.05f;
                 Sensor1.MetaDataLevel = MetaDataLevel.Version2;
-                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.019f);
-                Sensor1.SmartXact = SmartXactModeType.Default; //enable Metrology Mode
-                Sensor1.XEhancement = true;//enable XEnhancement
-                Sensor1.SmartXTractLaserLineThicknessFilter=new SmartXTract_LaserlineThicknessFilter(false,3,16);
-                Sensor1.SmartXTract_3DDataGenerationMode = DataGeneration3DModeType.TopEdgeOfLaserLine;
-                Sensor1.SmartXTract_ReflectionFilter=ReflectionParameter.Default_filter;
+                Sensor1.ZmapResolution = new ZmapResolution(0.001f, 0.006f);
+                Sensor1.SmartXact = SmartXactModeType.Metrology; //enable Metrology Mode
+                //Sensor1.XEhancement = true;//enable XEnhancement
+                Sensor1.SmartXTractLaserLineThicknessFilter = new SmartXTract_LaserlineThicknessFilter(true, 3, 48);
+                Sensor1.SmartXTract_3DDataGenerationMode = DataGeneration3DModeType.Default;
+                Sensor1.SmartXTract_ReflectionFilter = ReflectionParameter.Default_filter;
+                //Sensor1.SmartXTractFeatureAdditionalFilter = new SmartXtractAdditionalFilter(true, @"D:\Program Files\SmartRaySDK 6.0.7.9\smartxtract\High Accuracy-Repeatability.sxt");
+
                 //Sensor1.SmartXtractFeature = new SmartXtract(true, @"C:\SmartRay\SmartRay DevKit\SR_API\smartxtract\Glues.sxt");
                 //Sensor1.SmartXTract = @"C:\SmartRay\SmartRay DevKit\SR_API\smartxtract\Glues.sxt";
                 //if (Sensor1.SensorModel.Contains("ECCO X")) //binning mode just support the ECCO X series sensors
@@ -236,12 +238,14 @@ namespace APIX_Winform_Demo
                 {
                     //exposureGains.Add(new ExposureGain(4d, 3));
                    // new ExposureGain(10d, 2),
-                    new ExposureGain(16d, 3,40),
+new ExposureGain(10d, 7,40),
+                    //new ExposureGain(10d, 7,30),
+new ExposureGain(90d, 7,30)
                     //new ExposureGain(20d, 3,32),
                 };
                 Sensor1.ExposuresAndGains = exposureGains;
 
-                Sensor1.SensorROI = new ROI(0, 1920, 0, 1200);
+                Sensor1.SensorROI = new ROI(1408, 1024, 518, 220);
 
                 HiPerfTimer.Stop();
                 log.Info($"{Sensor1.SensorModel}");
@@ -452,7 +456,7 @@ namespace APIX_Winform_Demo
             }
             else if ((sender as CheckBox).Name == "ckb_XEnahancement")
             {
-                Sensor1.XEhancement = ckb_EnableVerticalBinning.Checked;
+                Sensor1.XEhancement = ckb_XEnahancement.Checked;
             }
         }
 
